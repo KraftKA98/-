@@ -12,7 +12,7 @@
  .owner-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px} .owner-grid .card{min-width:0}
 </style>
 <script src="./config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head><body><div class="app"><header><div class="brand">ХОЧУ<b>.</b></div><div class="row"><span class="tag">ОНЛАЙН · v11</span><button onclick="openNotifications()" aria-label="Уведомления" class="btn ghost" style="padding:8px 10px">🔔 <span id="unreadBadge" style="display:none">0</span></button><button onclick="refreshAll()" aria-label="Обновить" class="btn gray" style="padding:8px 10px">↻</button></div></header>
+</head><body><div class="app"><header><div class="brand">ХОЧУ<b>.</b></div><div class="row"><span class="tag">ОНЛАЙН · v12</span><button onclick="openNotifications()" aria-label="Уведомления" class="btn ghost" style="padding:8px 10px">🔔 <span id="unreadBadge" style="display:none">0</span></button><button onclick="refreshAll()" aria-label="Обновить" class="btn gray" style="padding:8px 10px">↻</button></div></header>
 <section id="home" class="page active"><div class="hero"><h1>Не ищи товары.<br>Пусть они найдут тебя.</h1><p>Создай запрос, укажи бюджет — продавцы предложат варианты.</p><div class="row" style="margin-top:20px"><span><strong id="countRequests">0</strong><br><span class="small">заявок</span></span><span style="margin-left:25px"><strong>15</strong><br><span class="small">категорий</span></span></div></div><button class="btn block" onclick="openRequest()">＋ Хочу купить или заказать услугу</button><button class="btn ghost block" style="margin-top:10px" onclick="openSellerMatches()">🎯 Я продавец — найти покупателей</button><h2>Категории</h2><div id="homeCats" class="grid"><button class="cat" onclick="setCategory('Электроника')"><span>📱</span>Электроника</button><button class="cat" onclick="setCategory('Авто')"><span>🚗</span>Авто</button><button class="cat" onclick="setCategory('Недвижимость')"><span>🏠</span>Недвижимость</button><button class="cat" onclick="setCategory('Одежда')"><span>👕</span>Одежда</button><button class="cat" onclick="setCategory('Услуги')"><span>🛠️</span>Услуги</button><button class="cat" onclick="setCategory('Стройматериалы')"><span>🧱</span>Стройматериалы</button></div><h2>Новые заявки</h2><div id="homeRequests" class="empty">Загрузка заявок…</div></section>
 <section id="matches" class="page"><div class="row between"><h2>🎯 Для продавца</h2><button class="btn ghost" onclick="openSubscriptionEditor()">＋ Подписка</button></div><p class="muted">Заявки, подходящие по выбранным категориям, городам и бюджету.</p><div id="matchingInfo" class="notice">Подбираем заявки…</div><div id="matchingRequests"></div><h2>Мои подписки</h2><div id="subscriptionsList"></div><p class="small muted">Уведомления о новых запросах появляются внутри сайта. Для системных push понадобится отдельное подключение.</p></section><section id="catalog" class="page"><button class="btn ghost block" onclick="openSellerMatches()" style="margin:2px 0 10px">🎯 Подходящие мне заявки и подписки</button><div class="row between"><h2>Запросы покупателей</h2><button class="btn ghost" onclick="openRequest()">＋ Запрос</button></div><input id="search" class="field" placeholder="🔎 Поиск по названию и городу" oninput="renderCatalog()"><div class="row" style="margin:10px 0"><select id="category" class="field" onchange="renderCatalog()"><option value="">Все категории</option></select><select id="sort" class="field" onchange="renderCatalog()"><option value="new">Новые</option><option value="cheap">Бюджет ↑</option><option value="expensive">Бюджет ↓</option></select></div><div id="catalogRequests"></div></section>
 <section id="activity" class="page"><h2>Моя активность</h2><div class="tabs"><button class="tab active" id="tabRequests" onclick="activityMode='requests';renderActivity()">Мои заявки</button><button class="tab" id="tabOffers" onclick="activityMode='offers';renderActivity()">Мои отклики</button><button class="tab" id="tabFavorites" onclick="activityMode='favorites';renderActivity()">Избранное</button></div><div id="activityContent"></div></section>
@@ -24,7 +24,7 @@
 'use strict';
 const cats=[['📱','Электроника'],['🚗','Авто'],['🏠','Недвижимость'],['👕','Одежда'],['🛠️','Услуги'],['🧱','Стройматериалы'],['🛋️','Мебель'],['💻','Компьютеры'],['🧸','Детские товары'],['⚽','Спорт'],['🐾','Животные'],['💄','Красота'],['🧰','Инструменты'],['🌿','Сад'],['📦','Другое']];
 const $=id=>document.getElementById(id);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const money=n=>Number(n).toLocaleString('ru-RU')+' ₽';
-let deals=[],reviews=[],subscriptions=[],matchingRequests=[],isAdmin=false,isOwner=false,adminReports=[],adminSuspensions=[];
+let deals=[],reviews=[],subscriptions=[],matchingRequests=[],isAdmin=false,isOwner=false,adminReports=[],adminSuspensions=[],ownerUsers=[],ownerSearch='';
 let db=null,user=null,profile=null,requests=[],offers=[],favorites=new Set(),mode='home',activityMode='requests',notifications=[],offerImages=[];
 const cfg=window.HOCHU_CONFIG||{};const configured=/^https:\/\/[^/]+\.supabase\.co\/?$/.test(cfg.supabaseUrl||'')&&!!cfg.supabaseKey&&!cfg.supabaseKey.startsWith('PASTE');
 function toast(s){$('toast').textContent=s;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',3500)}
@@ -273,16 +273,36 @@ async function adminAction(action,id,reason=''){
 
 async function loadOwnerPanel(){
  const el=$('ownerContent');if(!el)return;
- if(!user||!isOwner){el.innerHTML='<div class="empty">Доступ только владельцу</div>';return;}
+ if(!user||!isOwner){el.innerHTML='<div class="empty">Доступ только владельцу</div>';return}
  el.innerHTML='<div class="loader">Загружаем статистику…</div>';
  try{
-  const {data,error}=await db.rpc('hochu_owner_dashboard_v11');if(error)throw error;
-  const d=data||{};const count=(x)=>Number(x||0).toLocaleString('ru-RU');
+  const [dash,people]=await Promise.all([db.rpc('hochu_owner_dashboard_v11'),db.rpc('hochu_owner_users_v12')]);
+  if(dash.error)throw dash.error;if(people.error)throw people.error;
+  const d=dash.data||{};ownerUsers=people.data||[];
+  const count=x=>Number(x||0).toLocaleString('ru-RU');
   const metrics=[['👥 Пользователи',d.users],['📋 Заявки',d.requests],['🛍️ Предложения',d.offers],['🤝 Сделки',d.deals],['🚩 Открытые жалобы',d.open_reports],['🛡️ Модераторы',d.moderators]];
-  el.innerHTML='<div class="owner-grid">'+metrics.map(([label,n])=>`<div class="card" style="margin:0"><div class="muted small">${esc(label)}</div><div style="font-size:26px;font-weight:850;margin-top:7px">${count(n)}</div></div>`).join('')+'</div><h2>🛡️ Назначенные модераторы</h2>'+
-  (Array.isArray(d.admins)&&d.admins.length?d.admins.map(a=>`<div class="card"><b>${esc(a.email||'Email не указан')}</b><p class="muted small" style="overflow-wrap:anywhere">${esc(a.user_id)}</p><span class="chip">${a.is_owner?'Владелец':'Модератор'}</span></div>`).join(''):'<div class="empty">Модераторы не найдены</div>')+
-  '<p class="notice">В этой версии панель показывает статистику и список модераторов. Назначение и удаление прав пока выполняется в Supabase — так безопаснее, чем добавлять непроверенную кнопку.</p>';
- }catch(e){el.innerHTML=`<div class="notice">Не удалось загрузить панель: ${esc(e.message)}</div>`;}
+  el.innerHTML='<div class="owner-grid">'+metrics.map(([label,n])=>`<div class="card" style="margin:0"><div class="muted small">${esc(label)}</div><div style="font-size:26px;font-weight:850;margin-top:7px">${count(n)}</div></div>`).join('')+'</div>'+ 
+  '<h2>👥 Управление пользователями</h2><input id="ownerUserSearch" class="field" placeholder="Поиск по email, имени или UID" oninput="ownerSearch=this.value;renderOwnerUsers()" value="'+esc(ownerSearch)+'"><div id="ownerUsersList"></div>'+
+  '<p class="notice">Блокировка ограничивает доступ к действиям, защищённым серверными правилами. Для полной защиты всех операций необходимо проверить RLS и политики Supabase.</p>';
+  renderOwnerUsers();
+ }catch(e){el.innerHTML=`<div class="notice">Ошибка панели v12: ${esc(e.message)}. Сначала выполни SQL-файл обновления в Supabase.</div>`}
+}
+function renderOwnerUsers(){
+ const host=$('ownerUsersList');if(!host)return;
+ const q=ownerSearch.trim().toLowerCase();const matches=ownerUsers.filter(u=>[u.email,u.display_name,u.user_id].some(v=>String(v||'').toLowerCase().includes(q)));
+ host.innerHTML='<p class="small muted">Найдено: '+matches.length+' (максимум 500 последних пользователей)</p>'+(matches.length?matches.map(u=>`<div class="card"><b>${esc(u.display_name||'Без имени')}</b><p class="small muted" style="overflow-wrap:anywhere">${esc(u.email||'Email не указан')}<br>${esc(u.user_id)}</p><div class="row" style="flex-wrap:wrap"><span class="chip">${u.is_owner?'👑 Владелец':u.is_admin?'🛡️ Модератор':'Пользователь'}</span><span class="chip ${u.is_suspended?'':'green'}">${u.is_suspended?'Ограничен':'Активен'}</span></div><p class="small muted">Заявок: ${Number(u.requests_count||0)} · Откликов: ${Number(u.offers_count||0)} · Сделок: ${Number(u.deals_count||0)}</p><div class="row" style="flex-wrap:wrap;margin-top:10px">${u.is_owner?'':`<button class="btn ${u.is_suspended?'ghost':'warn'}" onclick="ownerToggleSuspension('${u.user_id}',${u.is_suspended})">${u.is_suspended?'Разблокировать':'Ограничить'}</button><button class="btn gray" onclick="ownerToggleModerator('${u.user_id}',${u.is_admin})">${u.is_admin?'Снять модератора':'Назначить модератором'}</button>`}</div></div>`).join(''):'<div class="empty">Пользователи не найдены</div>');
+}
+async function ownerToggleSuspension(id,suspended){
+ if(!isOwner||id===user?.id)return;
+ const reason=suspended?'':prompt('Причина ограничения (минимум 4 символа)','Нарушение правил платформы');
+ if(reason===null||(!suspended&&reason.trim().length<4))return;
+ if(!confirm(suspended?'Снять ограничение с пользователя?':'Ограничить пользователя?'))return;
+ try{const {error}=await db.rpc('hochu_owner_user_action_v12',{p_action:suspended?'unsuspend':'suspend',p_user_id:id,p_reason:reason});if(error)throw error;toast('Изменение сохранено');await loadOwnerPanel()}catch(e){toast('Ошибка: '+e.message)}
+}
+async function ownerToggleModerator(id,isModerator){
+ if(!isOwner||id===user?.id)return;
+ if(!confirm(isModerator?'Снять права модератора?':'Назначить модератором?'))return;
+ try{const {error}=await db.rpc('hochu_owner_user_action_v12',{p_action:isModerator?'remove_admin':'add_admin',p_user_id:id,p_reason:''});if(error)throw error;toast('Права обновлены');await refreshAll();await loadOwnerPanel()}catch(e){toast('Ошибка: '+e.message)}
 }
 
 function initialize(){const sel=$('category');cats.forEach(x=>{let opt=document.createElement('option');opt.value=x[1];opt.textContent=x[0]+' '+x[1];sel.appendChild(opt)});if(!configured){refreshAll();return}if(!window.supabase?.createClient){toast('Ошибка загрузки библиотеки Supabase');return}db=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseKey);db.auth.onAuthStateChange((event,session)=>{const newId=session?.user?.id||null;if(newId!==user?.id){user=session?.user||null;favorites=new Set(JSON.parse(localStorage.getItem('hochu_favorites_'+(newId||'guest'))||'[]'));setTimeout(refreshAll,0)}});refreshAll()}
