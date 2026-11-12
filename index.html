@@ -8,12 +8,12 @@
 .notif{border-left:4px solid var(--purple)}.notif.read{border-color:#ddd}
 #unreadBadge{background:#dd3458;color:white;border-radius:100px;padding:2px 5px;font-size:10px}
 #photoPreview{font-size:12px;color:var(--muted)}
-.mini-link{border:0;background:transparent;color:var(--purple);padding:3px;font-size:12px;text-decoration:underline}
+.subrow{display:flex;justify-content:space-between;gap:10px;align-items:start}.subrow .btn{flex-shrink:0}.mini-link{border:0;background:transparent;color:var(--purple);padding:3px;font-size:12px;text-decoration:underline}
 </style>
 <script src="./config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head><body><div class="app"><header><div class="brand">ХОЧУ<b>.</b></div><div class="row"><span class="tag">ОНЛАЙН · v8</span><button onclick="openNotifications()" aria-label="Уведомления" class="btn ghost" style="padding:8px 10px">🔔 <span id="unreadBadge" style="display:none">0</span></button><button onclick="refreshAll()" aria-label="Обновить" class="btn gray" style="padding:8px 10px">↻</button></div></header>
-<section id="home" class="page active"><div class="hero"><h1>Не ищи товары.<br>Пусть они найдут тебя.</h1><p>Создай запрос, укажи бюджет — продавцы предложат варианты.</p><div class="row" style="margin-top:20px"><span><strong id="countRequests">0</strong><br><span class="small">заявок</span></span><span style="margin-left:25px"><strong>15</strong><br><span class="small">категорий</span></span></div></div><button class="btn block" onclick="openRequest()">＋ Хочу купить или заказать услугу</button><h2>Категории</h2><div id="homeCats" class="grid"><button class="cat" onclick="setCategory('Электроника')"><span>📱</span>Электроника</button><button class="cat" onclick="setCategory('Авто')"><span>🚗</span>Авто</button><button class="cat" onclick="setCategory('Недвижимость')"><span>🏠</span>Недвижимость</button><button class="cat" onclick="setCategory('Одежда')"><span>👕</span>Одежда</button><button class="cat" onclick="setCategory('Услуги')"><span>🛠️</span>Услуги</button><button class="cat" onclick="setCategory('Стройматериалы')"><span>🧱</span>Стройматериалы</button></div><h2>Новые заявки</h2><div id="homeRequests" class="empty">Загрузка заявок…</div></section>
-<section id="catalog" class="page"><div class="row between"><h2>Запросы покупателей</h2><button class="btn ghost" onclick="openRequest()">＋ Запрос</button></div><input id="search" class="field" placeholder="🔎 Поиск по названию и городу" oninput="renderCatalog()"><div class="row" style="margin:10px 0"><select id="category" class="field" onchange="renderCatalog()"><option value="">Все категории</option></select><select id="sort" class="field" onchange="renderCatalog()"><option value="new">Новые</option><option value="cheap">Бюджет ↑</option><option value="expensive">Бюджет ↓</option></select></div><div id="catalogRequests"></div></section>
+</head><body><div class="app"><header><div class="brand">ХОЧУ<b>.</b></div><div class="row"><span class="tag">ОНЛАЙН · v9</span><button onclick="openNotifications()" aria-label="Уведомления" class="btn ghost" style="padding:8px 10px">🔔 <span id="unreadBadge" style="display:none">0</span></button><button onclick="refreshAll()" aria-label="Обновить" class="btn gray" style="padding:8px 10px">↻</button></div></header>
+<section id="home" class="page active"><div class="hero"><h1>Не ищи товары.<br>Пусть они найдут тебя.</h1><p>Создай запрос, укажи бюджет — продавцы предложат варианты.</p><div class="row" style="margin-top:20px"><span><strong id="countRequests">0</strong><br><span class="small">заявок</span></span><span style="margin-left:25px"><strong>15</strong><br><span class="small">категорий</span></span></div></div><button class="btn block" onclick="openRequest()">＋ Хочу купить или заказать услугу</button><button class="btn ghost block" style="margin-top:10px" onclick="openSellerMatches()">🎯 Я продавец — найти покупателей</button><h2>Категории</h2><div id="homeCats" class="grid"><button class="cat" onclick="setCategory('Электроника')"><span>📱</span>Электроника</button><button class="cat" onclick="setCategory('Авто')"><span>🚗</span>Авто</button><button class="cat" onclick="setCategory('Недвижимость')"><span>🏠</span>Недвижимость</button><button class="cat" onclick="setCategory('Одежда')"><span>👕</span>Одежда</button><button class="cat" onclick="setCategory('Услуги')"><span>🛠️</span>Услуги</button><button class="cat" onclick="setCategory('Стройматериалы')"><span>🧱</span>Стройматериалы</button></div><h2>Новые заявки</h2><div id="homeRequests" class="empty">Загрузка заявок…</div></section>
+<section id="matches" class="page"><div class="row between"><h2>🎯 Для продавца</h2><button class="btn ghost" onclick="openSubscriptionEditor()">＋ Подписка</button></div><p class="muted">Заявки, подходящие по выбранным категориям, городам и бюджету.</p><div id="matchingInfo" class="notice">Подбираем заявки…</div><div id="matchingRequests"></div><h2>Мои подписки</h2><div id="subscriptionsList"></div><p class="small muted">Уведомления о новых запросах появляются внутри сайта. Для системных push понадобится отдельное подключение.</p></section><section id="catalog" class="page"><button class="btn ghost block" onclick="openSellerMatches()" style="margin:2px 0 10px">🎯 Подходящие мне заявки и подписки</button><div class="row between"><h2>Запросы покупателей</h2><button class="btn ghost" onclick="openRequest()">＋ Запрос</button></div><input id="search" class="field" placeholder="🔎 Поиск по названию и городу" oninput="renderCatalog()"><div class="row" style="margin:10px 0"><select id="category" class="field" onchange="renderCatalog()"><option value="">Все категории</option></select><select id="sort" class="field" onchange="renderCatalog()"><option value="new">Новые</option><option value="cheap">Бюджет ↑</option><option value="expensive">Бюджет ↓</option></select></div><div id="catalogRequests"></div></section>
 <section id="activity" class="page"><h2>Моя активность</h2><div class="tabs"><button class="tab active" id="tabRequests" onclick="activityMode='requests';renderActivity()">Мои заявки</button><button class="tab" id="tabOffers" onclick="activityMode='offers';renderActivity()">Мои отклики</button><button class="tab" id="tabFavorites" onclick="activityMode='favorites';renderActivity()">Избранное</button></div><div id="activityContent"></div></section>
 <section id="inbox" class="page"><h2>Сообщения</h2><p class="muted small">Чаты доступны покупателю и продавцу после отправки предложения.</p><div id="chatList"></div></section>
 <section id="profile" class="page"><h2>Личный кабинет</h2><div id="profileContent"></div></section>
@@ -23,7 +23,7 @@
 'use strict';
 const cats=[['📱','Электроника'],['🚗','Авто'],['🏠','Недвижимость'],['👕','Одежда'],['🛠️','Услуги'],['🧱','Стройматериалы'],['🛋️','Мебель'],['💻','Компьютеры'],['🧸','Детские товары'],['⚽','Спорт'],['🐾','Животные'],['💄','Красота'],['🧰','Инструменты'],['🌿','Сад'],['📦','Другое']];
 const $=id=>document.getElementById(id);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const money=n=>Number(n).toLocaleString('ru-RU')+' ₽';
-let deals=[],reviews=[];
+let deals=[],reviews=[],subscriptions=[],matchingRequests=[];
 let db=null,user=null,profile=null,requests=[],offers=[],favorites=new Set(),mode='home',activityMode='requests',notifications=[],offerImages=[];
 const cfg=window.HOCHU_CONFIG||{};const configured=/^https:\/\/[^/]+\.supabase\.co\/?$/.test(cfg.supabaseUrl||'')&&!!cfg.supabaseKey&&!cfg.supabaseKey.startsWith('PASTE');
 function toast(s){$('toast').textContent=s;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',3500)}
@@ -49,8 +49,10 @@ async function refreshAll(){
    const d=await db.from('deals').select('id,request_id,offer_id,buyer_id,seller_id,status,selected_at,completed_at');if(d.error)throw d.error;deals=d.data||[];
    const rev=await db.from('seller_reviews').select('id,deal_id,buyer_id,seller_id,rating,comment,created_at').order('created_at',{ascending:false}).limit(500);if(rev.error)throw rev.error;reviews=rev.data||[];
    await loadNotifications();
-  }else{notifications=[];deals=[];reviews=[];updateBadge()}
-  renderAll();
+   await loadSellerSubscriptions();
+   await loadMatchingRequests();
+  }else{notifications=[];deals=[];reviews=[];subscriptions=[];matchingRequests=[];updateBadge()}
+  renderAll();renderMatches();
  }catch(err){console.error(err);toast('Ошибка загрузки: '+err.message);renderProfile()}
 }
 function renderAll(){$('countRequests').textContent=requests.length;$('homeRequests').innerHTML=requests.length?requests.slice(0,4).map(requestCard).join(''):'<div class="empty">Пока нет заявок. Создай первую!</div>';renderCatalog();renderActivity();renderProfile();renderInbox()}
@@ -66,7 +68,7 @@ function renderProfile(){
  if(!configured){el.innerHTML='<div class="notice">Supabase не подключён. Проверь config.js.</div>';return}
  if(!user){el.innerHTML='<div class="card"><h3>Создай личный кабинет</h3><p class="muted">Заявки, предложения и переписки доступны после входа.</p><button class="btn block" onclick="openAuth()">Регистрация / Вход</button></div>';return}
  const avatar=profile?.avatar_path?`<img class="avatar" src="${esc(avatarURL(profile.avatar_path))}" alt="Аватар">`:'<div class="avatar">👤</div>';
- el.innerHTML=`<div class="card"><div class="row">${avatar}<div><h3>${esc(profile?.display_name||'Пользователь')}</h3><p class="muted small">${esc(user.email)} · ${esc(profile?.city||'Город не указан')}</p><span class="chip">${profile?.seller_type==='business'?'Магазин / компания':'Частное лицо'}</span></div></div><p>${esc(profile?.about||'')}</p><div class="row"><span class="chip">Заявок: ${requests.filter(x=>x.buyer_id===user.id).length}</span><span class="chip">Откликов: ${offers.filter(x=>x.seller_id===user.id).length}</span><span class="chip">${sellerRating(user.id)}</span><span class="chip">Сделок: ${deals.filter(d=>d.seller_id===user.id && d.status==='completed').length}</span></div></div><button class="btn block" onclick="openEditProfile()">✏️ Редактировать профиль</button><button class="btn ghost block" style="margin-top:10px" onclick="openNotifications()">🔔 Уведомления (${notifications.filter(n=>!n.read_at).length})</button><button class="btn gray block" style="margin-top:10px" onclick="signOut()">Выйти</button>`
+ el.innerHTML=`<div class="card"><div class="row">${avatar}<div><h3>${esc(profile?.display_name||'Пользователь')}</h3><p class="muted small">${esc(user.email)} · ${esc(profile?.city||'Город не указан')}</p><span class="chip">${profile?.seller_type==='business'?'Магазин / компания':'Частное лицо'}</span></div></div><p>${esc(profile?.about||'')}</p><div class="row"><span class="chip">Заявок: ${requests.filter(x=>x.buyer_id===user.id).length}</span><span class="chip">Откликов: ${offers.filter(x=>x.seller_id===user.id).length}</span><span class="chip">${sellerRating(user.id)}</span><span class="chip">Сделок: ${deals.filter(d=>d.seller_id===user.id && d.status==='completed').length}</span></div></div><button class="btn block" onclick="openEditProfile()">✏️ Редактировать профиль</button><button class="btn ghost block" style="margin-top:10px" onclick="openSellerMatches()">🎯 Подписки продавца и подходящие заявки</button><button class="btn ghost block" style="margin-top:10px" onclick="openNotifications()">🔔 Уведомления (${notifications.filter(n=>!n.read_at).length})</button><button class="btn gray block" style="margin-top:10px" onclick="signOut()">Выйти</button>`
 }
 async function signOut(){await db.auth.signOut();user=null;profile=null;offers=[];await refreshAll();navigate('home');toast('Вы вышли')}
 function openEditProfile(){
@@ -136,13 +138,13 @@ async function loadOfferGallery(offerId){
 }
 async function loadNotifications(){
  if(!user){notifications=[];updateBadge();return}
- const {data,error}=await db.from('notifications').select('id,title,body,offer_id,read_at,created_at').order('created_at',{ascending:false}).limit(50);
+ const {data,error}=await db.from('notifications').select('id,title,body,offer_id,request_id,read_at,created_at').order('created_at',{ascending:false}).limit(50);
  if(error)throw error;notifications=data||[];updateBadge();
 }
 function updateBadge(){const n=notifications.filter(x=>!x.read_at).length,el=$('unreadBadge');if(el){el.textContent=n>99?'99+':n;el.style.display=n?'inline':'none'}}
 async function openNotifications(){
  if(!requireAuth())return;await loadNotifications();
- modal({title:'🔔 Уведомления',body:`<button class="btn ghost block" onclick="markAllRead()">Отметить всё прочитанным</button><div id="notificationsList">${notifications.length?notifications.map(n=>`<div class="card notif ${n.read_at?'read':''}"><b>${esc(n.title)}</b><p class="muted small">${esc(n.body)} · ${new Date(n.created_at).toLocaleString('ru-RU')}</p>${n.offer_id?`<button class="btn ghost" onclick="goFromNotification('${n.offer_id}','${n.id}')">Открыть переписку</button>`:''}</div>`).join(''):'<div class="empty">Пока нет уведомлений</div>'}</div><p class="muted small">Уведомления обновляются при открытии приложения и примерно раз в минуту. Это не push-уведомления.</p>`})
+ modal({title:'🔔 Уведомления',body:`<button class="btn ghost block" onclick="markAllRead()">Отметить всё прочитанным</button><div id="notificationsList">${notifications.length?notifications.map(n=>`<div class="card notif ${n.read_at?'read':''}"><b>${esc(n.title)}</b><p class="muted small">${esc(n.body)} · ${new Date(n.created_at).toLocaleString('ru-RU')}</p>${n.offer_id?`<button class="btn ghost" onclick="goFromNotification('${n.offer_id}','${n.id}')">Открыть переписку</button>`:n.request_id?`<button class="btn ghost" onclick="goToMatchedRequest('${n.request_id}','${n.id}')">Открыть заявку</button>`:''}</div>`).join(''):'<div class="empty">Пока нет уведомлений</div>'}</div><p class="muted small">Уведомления обновляются при открытии приложения и примерно раз в минуту. Это не push-уведомления.</p>`})
 }
 async function markAllRead(){const ids=notifications.filter(n=>!n.read_at).map(x=>x.id);if(!ids.length)return;
  const {error}=await db.from('notifications').update({read_at:new Date().toISOString()}).in('id',ids);if(error)return toast(error.message);await loadNotifications();await openNotifications();renderProfile();}
@@ -191,6 +193,48 @@ async function submitReview(e,id){
  e.preventDefault();const f=new FormData(e.target),btn=e.target.querySelector('[type=submit]');btn.disabled=true;
  try{const {error}=await db.rpc('hochu_review_seller_v8',{p_deal_id:id,p_rating:Number(f.get('rating')),p_comment:String(f.get('comment')||'').trim()});if(error)throw error;await refreshAll();showDeal(id);toast('Спасибо за отзыв!')}catch(err){toast('Ошибка отзыва: '+err.message)}finally{btn.disabled=false}
 }
+
+// ===== ХОЧУ. 9.0 — подбор по подпискам =====
+async function loadSellerSubscriptions(){
+ if(!user){subscriptions=[];return}
+ const {data,error}=await db.from('seller_subscriptions').select('id,seller_id,category,city,min_budget,max_budget,enabled,created_at').order('created_at',{ascending:false});
+ if(error)throw error;subscriptions=data||[];
+}
+async function loadMatchingRequests(){
+ if(!user){matchingRequests=[];return}
+ const {data,error}=await db.rpc('hochu_matching_requests_v9');
+ if(error)throw error;matchingRequests=data||[];
+}
+function renderMatches(){
+ const info=$('matchingInfo'),list=$('matchingRequests'),subs=$('subscriptionsList');if(!info||!list||!subs)return;
+ if(!user){info.textContent='Войди в аккаунт продавца, чтобы настроить подписки.';list.innerHTML='<button class="btn block" onclick="openAuth()">Регистрация / Вход</button>';subs.innerHTML='';return}
+ const active=subscriptions.filter(x=>x.enabled).length;
+ info.textContent=`Активных подписок: ${active}. Подходящих открытых заявок: ${matchingRequests.length}. Показаны не более 100 последних совпадений.`;
+ list.innerHTML=matchingRequests.length?matchingRequests.map(requestCard).join(''):'<div class="empty">Пока нет совпадений. Добавь подписку на нужную категорию и город.</div>';
+ subs.innerHTML=subscriptions.length?subscriptions.map(s=>`<div class="card subrow"><div><b>${esc(s.category)}</b><p class="muted small">${esc(s.city||'Все города')} · ${s.min_budget!=null?'от '+money(s.min_budget):'без минимальной цены'} · ${s.max_budget!=null?'до '+money(s.max_budget):'без максимальной цены'}</p><span class="chip ${s.enabled?'green':''}">${s.enabled?'Активна':'Приостановлена'}</span></div><div style="display:grid;gap:6px"><button class="btn ghost" onclick="toggleSubscription('${s.id}',${!s.enabled})">${s.enabled?'Пауза':'Включить'}</button><button class="btn gray" onclick="deleteSubscription('${s.id}')">Удалить</button></div></div>`).join(''):'<div class="empty">Подписок ещё нет</div>';
+}
+async function openSellerMatches(){if(!requireAuth())return;navigate('matches');try{await loadSellerSubscriptions();await loadMatchingRequests();renderMatches()}catch(e){toast('Ошибка подбора: '+e.message)}}
+function openSubscriptionEditor(){
+ if(!requireAuth())return;
+ if(subscriptions.length>=10)return toast('В тестовой версии максимум 10 подписок на аккаунт');
+ modal({title:'🎯 Новая подписка',body:`<form onsubmit="saveSubscription(event)"><div class="fieldset"><label class="fieldlabel">Категория</label><select class="field" name="category" required>${cats.map(x=>`<option value="${esc(x[1])}">${esc(x[0])} ${esc(x[1])}</option>`).join('')}</select></div><div class="fieldset"><label class="fieldlabel">Город (оставь пустым для всей России)</label><input class="field" name="city" maxlength="100" placeholder="Например, Екатеринбург"></div><div class="fieldset"><label class="fieldlabel">Бюджет покупателя от, ₽ (необязательно)</label><input class="field" type="number" inputmode="decimal" name="min" min="0" max="1000000000" step="1"></div><div class="fieldset"><label class="fieldlabel">Бюджет покупателя до, ₽ (необязательно)</label><input class="field" type="number" inputmode="decimal" name="max" min="1" max="1000000000" step="1"></div><button class="btn block" type="submit">Сохранить подписку</button></form><p class="small muted">При новых подходящих заявках получишь уведомление внутри приложения. На уже опубликованные заявки уведомления не отправляются — они доступны в подборке.</p>`});
+}
+async function saveSubscription(e){
+ e.preventDefault();if(!user)return;
+ const f=new FormData(e.target),category=String(f.get('category')||''),city=String(f.get('city')||'').trim(),min=String(f.get('min')||''),max=String(f.get('max')||'');
+ if(min&&max&&Number(min)>Number(max))return toast('Минимальный бюджет выше максимального');
+ const button=e.target.querySelector('[type="submit"]');button.disabled=true;
+ try{
+  const {error}=await db.from('seller_subscriptions').insert({seller_id:user.id,category,city,min_budget:min?Number(min):null,max_budget:max?Number(max):null});
+  if(error)throw error;closeModal();await loadSellerSubscriptions();await loadMatchingRequests();renderMatches();toast('Подписка сохранена!');
+ }catch(err){toast('Ошибка подписки: '+(err.code==='23505'?'Для этой категории и города подписка уже существует':err.message))}finally{button.disabled=false}
+}
+async function toggleSubscription(id,enabled){if(!user)return;try{const {error}=await db.from('seller_subscriptions').update({enabled}).eq('id',id);if(error)throw error;await loadSellerSubscriptions();await loadMatchingRequests();renderMatches()}catch(e){toast(e.message)}}
+async function deleteSubscription(id){if(!user||!confirm('Удалить подписку?'))return;try{const {error}=await db.from('seller_subscriptions').delete().eq('id',id);if(error)throw error;await loadSellerSubscriptions();await loadMatchingRequests();renderMatches()}catch(e){toast(e.message)}}
+async function goToMatchedRequest(requestId,notificationId){
+ try{const {error}=await db.from('notifications').update({read_at:new Date().toISOString()}).eq('id',notificationId);if(error)throw error;await refreshAll();closeModal();showRequest(requestId)}catch(e){toast('Ошибка открытия заявки: '+e.message)}
+}
+
 function initialize(){const sel=$('category');cats.forEach(x=>{let opt=document.createElement('option');opt.value=x[1];opt.textContent=x[0]+' '+x[1];sel.appendChild(opt)});if(!configured){refreshAll();return}if(!window.supabase?.createClient){toast('Ошибка загрузки библиотеки Supabase');return}db=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseKey);db.auth.onAuthStateChange((event,session)=>{const newId=session?.user?.id||null;if(newId!==user?.id){user=session?.user||null;favorites=new Set(JSON.parse(localStorage.getItem('hochu_favorites_'+(newId||'guest'))||'[]'));setTimeout(refreshAll,0)}});refreshAll()}
 initialize();
 </script></body></html>
