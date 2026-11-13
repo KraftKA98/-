@@ -1,0 +1,39 @@
+
+name: HOCHU PRO Expiry Reminders v19.3
+
+on:
+  schedule:
+    - cron: '13 10 * * *'  # Daily 10:13 UTC; schedule may be delayed.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hochu-pro-expiry-v193
+  cancel-in-progress: false
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Send idempotent PRO expiry reminders
+        env:
+          SUPABASE_URL: ${{ secrets.HOCHU_SUPABASE_URL }}
+          SERVICE_KEY: ${{ secrets.HOCHU_SUPABASE_SERVICE_ROLE_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${SUPABASE_URL:-}" || -z "${SERVICE_KEY:-}" ]]; then
+            echo 'Missing repository secrets' >&2
+            exit 1
+          fi
+          result=$(curl --fail-with-body --silent --show-error \
+            --retry 2 --max-time 45 \
+            --request POST "${SUPABASE_URL%/}/rest/v1/rpc/hochu_pro_expiry_batch_v193" \
+            --header "apikey: ${SERVICE_KEY}" \
+            --header "Authorization: Bearer ${SERVICE_KEY}" \
+            --header 'Content-Type: application/json' \
+            --data '{"p_limit":100}')
+          echo "Expiry RPC result: ${result}"
