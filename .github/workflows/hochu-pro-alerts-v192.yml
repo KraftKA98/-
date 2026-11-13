@@ -1,0 +1,39 @@
+
+name: HOCHU PRO Smart Alerts v19.2
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # GitHub Actions использует UTC; задержки возможны
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hochu-pro-alerts-v192
+  cancel-in-progress: false
+
+jobs:
+  deliver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Enrich notifications for active PRO sellers
+        env:
+          SUPABASE_URL: ${{ secrets.HOCHU_SUPABASE_URL }}
+          SERVICE_KEY: ${{ secrets.HOCHU_SUPABASE_SERVICE_ROLE_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${SUPABASE_URL:-}" || -z "${SERVICE_KEY:-}" ]]; then
+            echo 'Missing repository secrets' >&2
+            exit 1
+          fi
+          response=$(curl --fail-with-body --silent --show-error \
+            --retry 2 --max-time 45 \
+            --request POST "${SUPABASE_URL%/}/rest/v1/rpc/hochu_pro_alert_batch_v192" \
+            --header "apikey: ${SERVICE_KEY}" \
+            --header "Authorization: Bearer ${SERVICE_KEY}" \
+            --header 'Content-Type: application/json' \
+            --data '{"p_limit":250}')
+          echo "RPC result: ${response}"
