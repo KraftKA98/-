@@ -13,7 +13,7 @@ function searchCities(query,limit=30){
 }
 function canonicalBrand(value){
   const key=directoryNormalize(value);
-  return Object.entries(brandAliases).find(([brand,aliases])=>[brand,...aliases].some(alias=>directoryNormalize(alias)===key))?.[0]||value;
+  return Object.entries(brandAliases).find(([brand,aliases])=>[brand,...aliases].some(alias=>directoryNormalize(alias)===key))?.[0]||brandsForCategory('').find(brand=>directoryNormalize(brand)===key)||value;
 }
 function searchBrands(query,category,limit=30){
   const key=directoryNormalize(query);
@@ -66,6 +66,12 @@ function attachDirectory(input){
   const wrapper=document.createElement('div');wrapper.className='directory-picker';
   input.before(wrapper);wrapper.append(input);
   const list=document.createElement('div');list.id='directory-options-'+(++directorySequence);list.className='directory-options';list.role='listbox';list.hidden=true;wrapper.append(list);
+  const preview=document.createElement('div');preview.className='directory-selected';preview.hidden=true;wrapper.append(preview);
+  function showSelection(){
+    const badge=!city?carBrandBadge(input.value,directoryCategory(input)):'';
+    preview.innerHTML=badge?badge+'<span>'+categoryEscape(canonicalBrand(input.value))+'</span>':'';preview.hidden=!badge;
+  }
+  input.addEventListener('input',showSelection);showSelection();
   input.setAttribute('role','combobox');input.setAttribute('aria-autocomplete','list');input.setAttribute('aria-controls',list.id);input.setAttribute('aria-expanded','false');input.autocomplete='off';
   if(!input.getAttribute('aria-label')&&!input.id)input.setAttribute('aria-label',city?'Город':'Бренд / марка');
   let results=[],active=-1;
@@ -80,7 +86,7 @@ function attachDirectory(input){
   }
   function draw(){
     results=city?searchCities(input.value):searchBrands(input.value,directoryCategory(input));active=-1;
-    list.innerHTML=results.map((result,i)=>`<div role="option" aria-selected="false" id="${list.id}-${i}" data-option="${i}" class="directory-option"><strong>${categoryEscape(result.label)}</strong>${result.detail?`<span>${categoryEscape(result.detail)}</span>`:''}</div>`).join('')+`<div class="directory-hint" role="presentation">${results.length?(results.length===30?'Уточните название, чтобы сузить список.':'Выберите вариант из списка.'):'Совпадений нет. Можно ввести название вручную.'}</div>`;
+    list.innerHTML=results.map((result,i)=>`<div role="option" aria-selected="false" id="${list.id}-${i}" data-option="${i}" class="directory-option">${!city?carBrandBadge(result.value,directoryCategory(input)):''}<div><strong>${categoryEscape(result.label)}</strong>${result.detail?`<span>${categoryEscape(result.detail)}</span>`:''}</div></div>`).join('')+`<div class="directory-hint" role="presentation">${results.length?(results.length===30?'Уточните название, чтобы сузить список.':'Выберите вариант из списка.'):'Совпадений нет. Можно ввести название вручную.'}</div>`;
     list.hidden=false;input.setAttribute('aria-expanded','true');input.removeAttribute('aria-activedescendant');
     requestAnimationFrame(()=>{if(document.activeElement===input&&!list.hidden)list.scrollIntoView({block:'nearest'})});
   }
