@@ -15,14 +15,14 @@ function requestFieldDefinitions(category){
     ['deadline','Желаемый срок','date']];
   const fields=[['condition','Состояние','select',['Новое','Б/у','Не имеет значения']],
     ['delivery','Получение','select',['Самовывоз','Доставка','Любой вариант']]];
-  if(['Электроника','Компьютеры','Авто'].includes(group))fields.unshift(['model','Марка и модель','text']);
+  if(['Электроника','Компьютеры','Авто','Бытовая техника','Инструменты','Сад','Бизнес и оборудование'].includes(group))fields.unshift(['model','Модель','text']);
   if(group==='Электроника'||group==='Компьютеры')fields.push(['specs','Память и важные характеристики','text']);
   if(group==='Авто')fields.push(['year','Год выпуска от','number'],['mileage','Пробег до, км','number']);
   return fields;
 }
-function requestDetailsMarkup(category){
+function requestDetailsMarkup(category,brand=''){
   if(!category)return '<p class="small muted">Выберите категорию — появятся подсказки для вашего желания.</p>';
-  return '<p class="small muted">Уточните важное, чтобы получать подходящие предложения. Эти поля необязательные.</p>'+requestFieldDefinitions(category).map(([key,label,type,options])=>
+  return '<p class="small muted">Уточните важное, чтобы получать подходящие предложения. Эти поля необязательные.</p>'+`<div data-request-brand>${brandFieldMarkup(category,brand)}</div>`+requestFieldDefinitions(category).map(([key,label,type,options])=>
     `<label class="fieldset" style="display:block"><span class="fieldlabel">${esc(label)}</span>${type==='select'?`<select class="field" name="detail_${key}"><option value="">Не указано</option>${options.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('')}</select>`:`<input class="field" name="detail_${key}" type="${type}" ${type==='number'?'min="0" max="1000000000" step="1"':type==='text'?'maxlength="120"':''}>`}</label>`).join('');
 }
 function refreshRequestFields(picker){
@@ -32,6 +32,15 @@ function refreshRequestFields(picker){
   // Retain values shared by subcategories in the same main section.
   const group=categoryGroup(category)?.[1]||'';
   if(details.dataset.group!==group){details.innerHTML=requestDetailsMarkup(category);details.dataset.group=group}
+  const brandHost=details.querySelector('[data-request-brand]');
+  if(brandHost){
+    const input=brandHost.querySelector('input');
+    if(input?.dataset.category!==category){
+      const previous=input?.value||'',known=brandsForCategory('').includes(canonicalBrand(previous));
+      const keep=!known||brandsForCategory(category).includes(canonicalBrand(previous));
+      brandHost.innerHTML=brandFieldMarkup(category,keep?previous:'');
+    }
+  }
   refreshRequestBudget(form);
 }
 function refreshRequestBudget(form){
@@ -43,6 +52,11 @@ function refreshRequestBudget(form){
 }
 function requestDescription(formData,category){
   const lines=[];
+  const brand=String(formData.get('detail_brand')||'').trim();
+  if(brand&&categoryHasBrand(category)){
+    if(brand.length>80||/[\r\n]/.test(brand))throw Error('Проверьте название бренда (до 80 символов)');
+    lines.push('Бренд / марка: '+canonicalBrand(brand));
+  }
   for(const [key,label,type,options] of requestFieldDefinitions(category)){
     const value=String(formData.get('detail_'+key)||'').trim();if(!value)continue;
     if(value.length>120||(type==='select'&&!options.includes(value)))throw Error('Проверьте характеристики');
@@ -63,7 +77,7 @@ function requestFormMarkup(prefill={}){
   return `<form onsubmit="createRequest(event)" onchange="refreshRequestBudget(this)">
     <label class="fieldset" style="display:block"><span class="fieldlabel">Что вы ищете?</span><input class="field" name="title" maxlength="120" minlength="4" required placeholder="Например, ноутбук для учёбы" value="${esc(prefill.title||'')}"></label>
     <div class="fieldset"><span class="fieldlabel">Категория</span>${categoryPicker(category)}</div>
-    <div data-request-details data-group="${esc(categoryGroup(category)?.[1]||'')}">${requestDetailsMarkup(category)}</div>
+    <div data-request-details data-group="${esc(categoryGroup(category)?.[1]||'')}">${requestDetailsMarkup(category,prefill.brand)}</div>
     <label class="fieldset" style="display:block"><span class="fieldlabel" data-budget-label>Бюджет до, ₽</span><input class="field" type="number" min="1" max="1000000000" step="1" name="budget" required value="${esc(prefill.budget||'')}"></label>
     <label class="fieldset" style="display:block"><span class="fieldlabel">Город</span><input class="field" name="city" minlength="2" maxlength="100" required value="${esc(prefill.city||profile?.city||'')}"></label>
     <label class="fieldset" style="display:block"><span class="fieldlabel">Дополнительные пожелания</span><textarea class="field" name="description" maxlength="2000" placeholder="Что ещё важно?">${esc(prefill.description||'')}</textarea></label>
@@ -76,11 +90,11 @@ function createWishFromSearch(source){
   const category=home?homeCategorySelectedV232:catalogFilterV2321.category;
   const city=home?$('homeCityV231')?.value.trim():catalogFilterV2321.city;
   if(!requireAuth())return;
-  openRequest({title,category,city});
+  openRequest({title,category,city,brand:home?homeBrandFilter:catalogFilterV2321.brand});
 }
 function resetEmptySearch(source){
   if(source==='home'){resetHomeFiltersV231();return}
-  $('search').value='';Object.assign(catalogFilterV2321,{category:'',city:'',min:'',max:'',sort:'new'});renderCatalog();
+  $('search').value='';Object.assign(catalogFilterV2321,{category:'',city:'',brand:'',min:'',max:'',sort:'new'});renderCatalog();
 }
 function emptyWishMarkup(source){
   return `<div class="empty"><h3>Такого желания пока нет</h3><p>Расскажите, что ищете, — продавцы смогут предложить варианты.</p><div class="row" style="justify-content:center;flex-wrap:wrap"><button class="btn" onclick="createWishFromSearch('${source}')">Создать такое желание</button><button class="btn ghost" onclick="resetEmptySearch('${source}')">Сбросить фильтры</button></div></div>`;
