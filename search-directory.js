@@ -11,11 +11,10 @@ function searchCities(query,limit=30){
     .sort((a,b)=>(b.nameKey===key)-(a.nameKey===key)||(b.nameKey.startsWith(key))-(a.nameKey.startsWith(key))||a.label.localeCompare(b.label,'ru'))
     .slice(0,limit);
 }
-function canonicalBrand(value){
-  const key=directoryNormalize(value);
-  return Object.entries(brandAliases).find(([brand,aliases])=>[brand,...aliases].some(alias=>directoryNormalize(alias)===key))?.[0]||brandsForCategory('').find(brand=>directoryNormalize(brand)===key)||value;
-}
-function searchBrands(query,category,limit=30){
+const canonicalBrandIndex=new Map(brandsForCategory('').map(brand=>[directoryNormalize(brand),brand]));
+for(const [brand,aliases] of Object.entries(brandAliases))for(const alias of [brand,...aliases])canonicalBrandIndex.set(directoryNormalize(alias),brand);
+function canonicalBrand(value){return canonicalBrandIndex.get(directoryNormalize(value))||value}
+function searchBrands(query,category,limit=Infinity){
   const key=directoryNormalize(query);
   return brandsForCategory(category).filter(brand=>[brand,...(brandAliases[brand]||[])].some(alias=>directoryNormalize(alias).includes(key)))
     .sort((a,b)=>Number(directoryNormalize(b).startsWith(key))-Number(directoryNormalize(a).startsWith(key))||a.localeCompare(b,'ru'))
@@ -64,6 +63,7 @@ function attachDirectory(input){
   input.dataset.directoryReady='true';
   const city=input.dataset.directory==='city';
   const wrapper=document.createElement('div');wrapper.className='directory-picker';
+  wrapper.dataset.kind=city?'city':'brand';
   input.before(wrapper);wrapper.append(input);
   const list=document.createElement('div');list.id='directory-options-'+(++directorySequence);list.className='directory-options';list.role='listbox';list.hidden=true;wrapper.append(list);
   const preview=document.createElement('div');preview.className='directory-selected';preview.hidden=true;wrapper.append(preview);
@@ -84,20 +84,29 @@ function attachDirectory(input){
     input.value=chosen.value;close();
     input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));close();
   }
-  function draw(){
-    results=city?searchCities(input.value):searchBrands(input.value,directoryCategory(input));active=-1;
-    list.innerHTML=results.map((result,i)=>`<div role="option" aria-selected="false" id="${list.id}-${i}" data-option="${i}" class="directory-option">${!city?brandBadge(result.value,directoryCategory(input)):''}<div><strong>${categoryEscape(result.label)}</strong>${result.detail?`<span>${categoryEscape(result.detail)}</span>`:''}</div></div>`).join('')+`<div class="directory-hint" role="presentation">${results.length?(results.length===30?'Уточните название, чтобы сузить список.':'Выберите вариант из списка.'):'Совпадений нет. Можно ввести название вручную.'}</div>`;
+  function draw(showAll=false){
+    const query=showAll===true?'':input.value;
+    results=city?searchCities(query):searchBrands(query,directoryCategory(input));active=-1;
+    const summary=!city?`<div class="directory-summary" role="presentation">${directoryNormalize(query)?'Найдено брендов':'Все бренды'}: ${results.length} · можно прокручивать</div>`:'';
+    list.innerHTML=summary+results.map((result,i)=>`<div role="option" aria-selected="false" id="${list.id}-${i}" data-option="${i}" class="directory-option">${!city?brandBadge(result.value,directoryCategory(input)):''}<div><strong>${categoryEscape(result.label)}</strong>${result.detail?`<span>${categoryEscape(result.detail)}</span>`:''}</div></div>`).join('')+`<div class="directory-hint" role="presentation">${results.length?(city&&results.length===30?'Уточните название, чтобы сузить список.':'Выберите вариант из списка.'):'Совпадений нет. Можно ввести название вручную.'}</div>`;
+    list.scrollTop=0;
     list.hidden=false;input.setAttribute('aria-expanded','true');input.removeAttribute('aria-activedescendant');
     requestAnimationFrame(()=>{if(document.activeElement===input&&!list.hidden)list.scrollIntoView({block:'nearest'})});
   }
-  input.addEventListener('focus',draw);input.addEventListener('input',draw);
+  input.addEventListener('focus',()=>draw(!city));input.addEventListener('input',()=>draw());
+  if(!city){
+    const browse=document.createElement('button');browse.type='button';browse.className='directory-browse';browse.textContent='Все бренды';browse.setAttribute('aria-controls',list.id);
+    input.after(browse);
+    browse.addEventListener('mousedown',event=>event.preventDefault());
+    browse.addEventListener('click',()=>{input.focus();draw(true)});
+  }
   input.addEventListener('blur',close);
   list.addEventListener('mousedown',e=>e.preventDefault());
   list.addEventListener('click',e=>{const option=e.target.closest('[data-option]');if(option)choose(Number(option.dataset.option))});
   input.addEventListener('keydown',event=>{
     if(event.key==='Escape'){if(!list.hidden){close();event.stopPropagation()}return}
     if(event.key==='ArrowDown'||event.key==='ArrowUp'){
-      event.preventDefault();if(list.hidden)draw();
+      event.preventDefault();if(list.hidden)draw(!city);
       if(results.length){active=active<0?(event.key==='ArrowDown'?0:results.length-1):(active+(event.key==='ArrowDown'?1:-1)+results.length)%results.length;highlight()}
     }else if(event.key==='Enter'&&!list.hidden&&active>=0){event.preventDefault();choose(active)}
     else if(event.key==='Tab')close();
