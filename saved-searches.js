@@ -58,7 +58,7 @@ async function openSavedSearchResults(id){
  try{
   const {data,error}=await db.rpc('hochu_saved_search_results_v242',{p_search_id:id});if(error)throw error;
   if(!host.isConnected||user?.id!==owner)return;
-  const rows=data||[];for(const row of rows){const i=requests.findIndex(r=>r.id===row.id);if(i<0)requests.push(row);else requests[i]=row}
+  const rows=(data||[]).filter(requestIsCurrent);for(const row of rows){const i=requests.findIndex(r=>r.id===row.id);if(i<0)requests.push(row);else requests[i]=row}
   host.className='';host.innerHTML=`<button class="btn ghost block" onclick="openSavedSearches()">← Сохранённые поиски</button><p class="small muted">Найдено: ${rows.length}${rows.length===100?' · показаны последние 100':''}. Уведомления приходят о новых желаниях после сохранения поиска.</p>${rows.length?rows.map(requestCard).join(''):'<div class="empty">Пока нет подходящих желаний. Можно вернуться позже.</div>'}`;queueRequestPhotos();
  }catch(error){if(host.isConnected)host.textContent=savedSearchError(error)}
 }
@@ -66,7 +66,7 @@ async function openMatchedNotification(requestId,notificationId){
  if(!requireAuth())return;
  try{
   const owner=user.id;
-  const result=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision').eq('id',requestId).maybeSingle();if(result.error)throw result.error;
+  const result=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at').eq('id',requestId).maybeSingle();if(result.error)throw result.error;
   if(user?.id!==owner)return;
   const {error}=await db.from('notifications').update({read_at:new Date().toISOString()}).eq('id',notificationId);if(error)throw error;
   await loadNotifications();

@@ -126,8 +126,8 @@ h2{font-size:21px;letter-spacing:-.5px}.hero{border-radius:25px;padding:21px 20p
 .offer-comparison{border-collapse:collapse;width:100%;min-width:620px}.offer-comparison th,.offer-comparison td{padding:12px;border:1px solid #d8e2d5;text-align:left;vertical-align:top;min-width:170px}.offer-comparison th{background:#edf1e9}.offer-comparison td{max-width:280px}.offer-comparison .btn{white-space:normal}
 </style>
 <script src="./config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="./offer-details.css"><link rel="stylesheet" href="./auction.css"><link rel="stylesheet" href="./auction-discovery.css"><link rel="stylesheet" href="./saved-sellers.css">
-</head><body><div class="app"><header><div class="brand">ХОЧУ<b>.</b></div><div class="row"><span class="tag">ХОЧУ · v24.7.0</span><button onclick="openNotifications()" aria-label="Уведомления" class="btn ghost" style="padding:8px 10px">🔔 <span id="unreadBadge" style="display:none">0</span></button><button onclick="refreshAll()" aria-label="Обновить" class="btn gray" style="padding:8px 10px">↻</button></div></header>
+<link rel="stylesheet" href="./offer-details.css"><link rel="stylesheet" href="./auction.css"><link rel="stylesheet" href="./auction-discovery.css"><link rel="stylesheet" href="./saved-sellers.css"><link rel="stylesheet" href="./request-lifetime.css">
+</head><body><div class="app"><header><div class="brand">ХОЧУ<b>.</b></div><div class="row"><span class="tag">ХОЧУ · v24.8.0</span><button onclick="openNotifications()" aria-label="Уведомления" class="btn ghost" style="padding:8px 10px">🔔 <span id="unreadBadge" style="display:none">0</span></button><button onclick="refreshAll()" aria-label="Обновить" class="btn gray" style="padding:8px 10px">↻</button></div></header>
 <section id="home" class="page active"><div class="hero"><h1>Ты хочешь.<br>Тебе предлагают.</h1><p>Расскажи, что нужно. Продавцы сами найдут тебя и предложат цену.</p><div class="row"><span><strong id="countRequests">…</strong><br><span class="small">активных желаний</span></span><span style="margin-left:24px"><strong id="categoryCount"></strong><br><span class="small">категорий</span></span></div></div>
 <div class="home-actions"><button class="btn action-main" onclick="openRequest()">＋ Разместить желание</button><button class="btn action-seller" onclick="openSellerMatches()">🎯 Я продавец</button><button class="btn action-crowd" onclick="openCrowdV200()">👥 Купить толпой</button></div>
 <div class="social-heading"><h2>Что ищем сегодня?</h2><button class="mini-link" onclick="navigate('catalog');openCatalogFiltersV2321()">Все категории →</button></div><div id="homeCats" class="grid home-cats"></div>
@@ -147,7 +147,7 @@ h2{font-size:21px;letter-spacing:-.5px}.hero{border-radius:25px;padding:21px 20p
 <div class="mobile-filter-label">Сортировка</div><div id="catalogSortChoicesV2321" class="mobile-sort-options" role="group" aria-label="Сортировка"></div>
 </div><div class="mobile-filter-footer"><button type="button" class="btn ghost" onclick="resetCatalogFiltersV2321()">Сбросить</button><button type="button" class="btn" onclick="applyCatalogFiltersV2321()">Показать желания</button></div>
 </section></div><div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()"><div class="modal" id="modal"></div></div><div id="toast" class="toast"></div>
-<script src="./categories.js"></script><script src="./cities-data.js"></script><script src="./brands-data.js"></script><script src="./product-catalog.js"></script><script src="./car-brands.js"></script><script src="./car-brand-ui.js"></script><script src="./product-brands.js"></script><script src="./product-brand-ui.js"></script><script src="./car-model-data.js"></script><script src="./phone-model-data.js"></script><script src="./model-picker.js"></script><script src="./search-directory.js"></script><script src="./request-tools.js"></script><script src="./request-editor.js"></script><script src="./saved-searches.js"></script><script src="./offer-details.js"></script><script src="./auction.js"></script><script src="./auction-discovery.js"></script><script src="./auction-notifications.js"></script><script src="./saved-sellers.js"></script>
+<script src="./categories.js"></script><script src="./cities-data.js"></script><script src="./brands-data.js"></script><script src="./product-catalog.js"></script><script src="./car-brands.js"></script><script src="./car-brand-ui.js"></script><script src="./product-brands.js"></script><script src="./product-brand-ui.js"></script><script src="./car-model-data.js"></script><script src="./phone-model-data.js"></script><script src="./model-picker.js"></script><script src="./search-directory.js"></script><script src="./request-tools.js"></script><script src="./request-editor.js"></script><script src="./saved-searches.js"></script><script src="./offer-details.js"></script><script src="./auction.js"></script><script src="./auction-discovery.js"></script><script src="./auction-notifications.js"></script><script src="./saved-sellers.js"></script><script src="./request-lifetime.js"></script>
 <script>
 'use strict';
 
@@ -196,13 +196,14 @@ async function ensureProfile(){if(!user)return;let {data,error}=await db.from('p
 async function refreshAll(){
  if(!configured){$('homeRequests').innerHTML='<div class="notice">⚙️ Подключи Supabase в config.js.</div>';renderProfile();return}
  if(!db){toast('Библиотека Supabase не загрузилась');return}
+ loadRequestLifetimeClock();
  try{
   // v23.5.1: отсутствие сессии — штатный гостевой режим, а не ошибка публичной страницы.
    const {data:authData,error:ae}=await db.auth.getUser();
    const missingSession=ae&&(ae.name==='AuthSessionMissingError'||/auth session missing|session missing/i.test(ae.message||''));
    if(ae&&!missingSession)throw ae;
    user=missingSession?null:(authData?.user||null);if(user){await ensureProfile();const check=await db.rpc('hochu_is_admin');isAdmin=!check.error && check.data===true;const own=await db.rpc('hochu_is_owner_v11');isOwner=!own.error&&own.data===true;}else{profile=null;isAdmin=false;isOwner=false;}
-  const res=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision').order('created_at',{ascending:false}).limit(200);
+  const res=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at').order('created_at',{ascending:false}).limit(200);
   if(res.error)throw res.error;requests=res.data||[];offers=[];offerImages=[];
   // Обновляем публичные разделы сразу после загрузки заявок.
   // Ошибки дополнительных модулей не должны оставлять на главной ложный ноль.
@@ -221,8 +222,8 @@ async function refreshAll(){
     const host=$('homeRequests');if(host&&requests.length===0)host.innerHTML='<div class="notice">Не удалось получить заявки. Проверь подключение Supabase и права доступа, затем нажми ↻.</div>';
   }
 }
-function publicRequests(){return requests.filter(r=>r.status==='open'&&!r.is_hidden)}
-function visibleCatalogRequests(){return requests.filter(r=>(r.status==='open'&&!r.is_hidden)||(user&&r.buyer_id===user.id))}
+function publicRequests(){return requests.filter(r=>r.status==='open'&&!r.is_hidden&&requestIsCurrent(r))}
+function visibleCatalogRequests(){return requests.filter(r=>(r.status==='open'&&!r.is_hidden&&requestIsCurrent(r))||(user&&r.buyer_id===user.id))}
 let homeCategorySelectedV232='',homeSortSelectedV232='new';
 function renderHomeFilterChoicesV232(){
  const holder=$('homeCategoryButtonsV232');if(!holder)return;
@@ -266,11 +267,11 @@ function renderHomeFeed(){
 }
 function renderAll(){syncMyAuctionIdentity();syncSavedSellerIdentity();const current=publicRequests();$('countRequests').textContent=current.length;renderHomeFeed();renderCatalog();renderActivity();renderProfile();renderInbox()}
 function requestCard(r){
- const mine=r.buyer_id===user?.id,closed=r.status==='closed',deal=deals.find(d=>d.request_id===r.id),status=r.is_hidden?'Скрыта модератором':deal?(deal.status==='completed'?'Сделка завершена':'Продавец выбран'):(closed?'Закрыта':'Ищет предложения');
+ const mine=r.buyer_id===user?.id,closed=r.status==='closed',deal=deals.find(d=>d.request_id===r.id),status=r.is_hidden?'Скрыта модератором':deal?(deal.status==='completed'?'Сделка завершена':'Продавец выбран'):(requestLifetimeExpired(r)?'Срок актуальности истёк':closed?'Закрыта':'Ищет предложения');
  const date=r.created_at?new Date(r.created_at).toLocaleDateString('ru-RU'):'';
  const desc=String(r.description||'').trim();
  const saved=favorites.has(r.id);
- return `<article class="card wish-card"><div class="wish-top"><div class="wish-avatar" aria-hidden="true">${requestBrandBadge(r)||categoryIcon(r.category)}</div><div><div class="wish-author">${mine?'Моё желание':'Покупатель ищет'}</div><div class="wish-date">${esc(date)}</div></div><span class="chip ${!closed&&!deal?'green':''}">${esc(status)}</span></div><h3>${esc(r.title)}</h3>${auctionFeedBadgeMarkup(r)}${requestPhotosMarkup(r,true)}${desc?`<p class="wish-description">${esc(desc.slice(0,180))}${desc.length>180?'…':''}</p>`:''}<div class="wish-meta"><span>📍 ${esc(r.city||'Город не указан')}</span><span>${esc(r.category||'Другое')}</span></div><div class="wish-footer"><div class="wish-budget"><small>Бюджет покупателя</small><strong>${money(r.budget)}</strong></div><div class="row"><button class="btn wish-save" aria-pressed="${saved}" aria-label="${saved?'Убрать из избранного':'В избранное'}" onclick="toggleFavoriteFromFeed('${r.id}')">${saved?'♥':'♡'}</button><button class="btn" onclick="showRequest('${r.id}')">${mine?'Управлять':'Подробнее →'}</button></div></div></article>`;
+ return `<article class="card wish-card"><div class="wish-top"><div class="wish-avatar" aria-hidden="true">${requestBrandBadge(r)||categoryIcon(r.category)}</div><div><div class="wish-author">${mine?'Моё желание':'Покупатель ищет'}</div><div class="wish-date">${esc(date)}</div></div><span class="chip ${!closed&&!deal?'green':''}">${esc(status)}</span></div><h3>${esc(r.title)}</h3>${requestLifetimeBadge(r)}${auctionFeedBadgeMarkup(r)}${requestPhotosMarkup(r,true)}${desc?`<p class="wish-description">${esc(desc.slice(0,180))}${desc.length>180?'…':''}</p>`:''}<div class="wish-meta"><span>📍 ${esc(r.city||'Город не указан')}</span><span>${esc(r.category||'Другое')}</span></div><div class="wish-footer"><div class="wish-budget"><small>Бюджет покупателя</small><strong>${money(r.budget)}</strong></div><div class="row"><button class="btn wish-save" aria-pressed="${saved}" aria-label="${saved?'Убрать из избранного':'В избранное'}" onclick="toggleFavoriteFromFeed('${r.id}')">${saved?'♥':'♡'}</button><button class="btn" onclick="showRequest('${r.id}')">${mine?'Управлять':'Подробнее →'}</button></div></div></article>`;
 }
 function toggleFavoriteFromFeed(id){if(!requireAuth())return;favorites.has(id)?favorites.delete(id):favorites.add(id);try{localStorage.setItem('hochu_favorites_'+user.id,JSON.stringify([...favorites]))}catch(e){console.warn(e)}renderHomeFeed();renderActivity()}
 
@@ -369,9 +370,9 @@ async function createRequest(e){return submitRequestEditor(e)}
 function showRequest(id){
  const r=requests.find(x=>x.id===id);if(!r)return;
  const mine=r.buyer_id===user?.id,star=favorites.has(id),deal=deals.find(d=>d.request_id===id);
- const status=deal?(deal.status==='completed'?'Сделка завершена':'Продавец выбран'):(r.status==='open'?'Активна':'Закрыта');
+ const status=deal?(deal.status==='completed'?'Сделка завершена':'Продавец выбран'):(requestLifetimeExpired(r)?'Срок актуальности истёк':r.status==='open'?'Активна':'Закрыта');
  const dealButton=mine&&deal?`<button class="btn ghost" onclick="showDeal('${deal.id}')">🤝 ${deal.status==='completed'?'Детали сделки':'Управление сделкой'}</button>`:'';
- modal({title:esc(r.title),body:`<p class="muted">${esc(r.category)} · 📍 ${esc(r.city)} · ${status}</p><div class="price">${money(r.budget)}</div>${auctionPanelMarkup(r)}${requestPhotosMarkup(r)}<p style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(r.description||'Без описания')}</p><div class="row" style="flex-wrap:wrap"><button class="btn ghost" onclick="toggleFavorite('${r.id}')">${star?'♥ Удалить из избранного':'♡ В избранное'}</button>${!mine?`<button class="btn gray" onclick="openReport('request','${r.id}')">⚑ Пожаловаться</button>`:``}${!mine?`<button class="btn ghost" onclick="startDirectSellerV237('${r.buyer_id}')">💬 Написать покупателю</button>`:``}${dealButton}${editableWish(r)?`<button class="btn ghost" data-auction-edit="${r.id}" onclick="openRequestEditor('${r.id}')">✏️ Редактировать</button>`:''}${mine&&!deal?`<button class="btn gray" onclick="toggleStatus('${r.id}','${r.status==='open'?'closed':'open'}')">${r.status==='open'?'Закрыть заявку':'Открыть снова'}</button>`:!mine&&r.status==='open'&&!r.is_hidden?`<button class="btn" onclick="${myOfferForRequest(r.id)?`openChat('${myOfferForRequest(r.id).id}')`:`openOffer('${r.id}')`}">${myOfferForRequest(r.id)?'💬 Мой чат':'💬 Предложить вариант'}</button>`:''}</div><h2>Предложения продавцов</h2><div id="requestOffers">Загрузка…</div>`});loadRequestOffers(id);loadAuctionPanel(id);queueRequestPhotos()
+ modal({title:esc(r.title),body:`<p class="muted">${esc(r.category)} · 📍 ${esc(r.city)} · ${status}</p><div class="price">${money(r.budget)}</div>${requestLifetimePanel(r)}${auctionPanelMarkup(r)}${requestPhotosMarkup(r)}<p style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(r.description||'Без описания')}</p><div class="row" style="flex-wrap:wrap"><button class="btn ghost" onclick="toggleFavorite('${r.id}')">${star?'♥ Удалить из избранного':'♡ В избранное'}</button>${!mine?`<button class="btn gray" onclick="openReport('request','${r.id}')">⚑ Пожаловаться</button>`:``}${!mine?`<button class="btn ghost" onclick="startDirectSellerV237('${r.buyer_id}')">💬 Написать покупателю</button>`:``}${dealButton}${editableWish(r)?`<button class="btn ghost" data-auction-edit="${r.id}" onclick="openRequestEditor('${r.id}')">✏️ Редактировать</button>`:''}${mine&&!deal&&!(r.status==='closed'&&r.expired_at)?`<button class="btn gray" onclick="toggleStatus('${r.id}','${r.status==='open'?'closed':'open'}')">${r.status==='open'?'Закрыть заявку':'Открыть снова'}</button>`:!mine&&r.status==='open'&&!r.is_hidden&&requestIsCurrent(r)?`<button class="btn" onclick="${myOfferForRequest(r.id)?`openChat('${myOfferForRequest(r.id).id}')`:`openOffer('${r.id}')`}">${myOfferForRequest(r.id)?'💬 Мой чат':'💬 Предложить вариант'}</button>`:''}</div><h2>Предложения продавцов</h2><div id="requestOffers">Загрузка…</div>`});loadRequestOffers(id);loadAuctionPanel(id);queueRequestPhotos()
 }
 async function toggleStatus(id,status){
  if(!requireAuth()||!startAction('request:status:'+id))return;
@@ -387,7 +388,7 @@ function toggleFavorite(id){favorites.has(id)?favorites.delete(id):favorites.add
 async function loadRequestOffers(id){return loadDetailedRequestOffers(id)}
 
 function openOffer(id){
- if(!requireAuth())return;const previous=myOfferForRequest(id);if(previous){openAuctionBidOrChat(previous);return;}const r=requests.find(x=>x.id===id);if(!r||r.buyer_id===user.id||r.status!=='open'||r.is_hidden)return toast('Эта заявка недоступна для предложений');
+ if(!requireAuth())return;const previous=myOfferForRequest(id);if(previous){openAuctionBidOrChat(previous);return;}const r=requests.find(x=>x.id===id);if(!r||r.buyer_id===user.id||r.status!=='open'||r.is_hidden||!requestIsCurrent(r))return toast('Эта заявка недоступна для предложений');
  modal({title:'Предложить вариант',body:`<p class="muted">${esc(r.title)} · бюджет ${money(r.budget)}</p><form onsubmit="sendOffer(event,'${id}')"><div data-auction-form class="auction-panel"><p class="small">Проверяем условия торгов…</p></div><div class="fieldset"><label class="fieldlabel">Ваша цена, ₽</label><input class="field" type="number" name="price" min="1" max="1000000000" required></div>${brandFieldMarkup(r.category)}${offerSpecificationMarkup(r.category)}${offerTermsMarkup(r.category)}<div class="fieldset"><label class="fieldlabel">Что предлагаете?</label><textarea class="field" name="description" minlength="4" maxlength="2000" required placeholder="Состояние, характеристики, сроки…"></textarea></div><div class="fieldset"><label class="fieldlabel">Фото (до 5, каждое до 5 МБ)</label><input class="field" type="file" name="photos" accept="image/jpeg,image/png,image/webp" multiple onchange="previewPhotoCount(this)"><span id="photoPreview">Можно оставить без фотографий</span></div><button type="submit" class="btn block">Отправить предложение</button></form>`});loadAuctionOfferForm(id,$('modal').querySelector('form'))
 }
 async function sendOffer(e,id){
@@ -491,7 +492,7 @@ async function loadOfferGallery(offerId){
 }
 async function loadNotifications(){
  if(!user){notifications=[];updateBadge();return}const owner=user.id;
- const {data,error}=await db.from('notifications').select('id,title,body,offer_id,request_id,read_at,created_at,auction_event').order('created_at',{ascending:false}).limit(50);
+ const {data,error}=await db.from('notifications').select('id,title,body,offer_id,request_id,read_at,created_at,auction_event,request_event').order('created_at',{ascending:false}).limit(50);
  if(user?.id!==owner)return;if(error)throw error;notifications=data||[];updateBadge();
 }
 function updateBadge(){const n=notifications.filter(x=>!x.read_at).length,el=$('unreadBadge');if(el){el.textContent=n>99?'99+':n;el.style.display=n?'inline':'none'}}
@@ -903,7 +904,7 @@ function renderMatches(){
  const info=$('matchingInfo'),list=$('matchingRequests'),subs=$('subscriptionsList'),demand=$('matchDemand');if(!info||!list||!subs)return;
  if(!user){info.textContent='Войди в аккаунт продавца, чтобы настроить подписки.';list.innerHTML='<button class="btn block" onclick="openAuth()">Регистрация / Вход</button>';subs.innerHTML='';if(demand)demand.innerHTML='';return}
  const active=subscriptions.filter(x=>x.enabled).length;
- const matches=matchingRequests.filter(r=>r.status==='open'&&!r.is_hidden&&r.buyer_id!==user.id).map(rankedMatch);
+ const matches=matchingRequests.filter(r=>r.status==='open'&&!r.is_hidden&&requestIsCurrent(r)&&r.buyer_id!==user.id).map(rankedMatch);
  const query=normalizeMatchText($('matchSearch')?.value),sort=$('matchSort')?.value||'score';
  let shown=matches.filter(x=>!query||normalizeMatchText(x.r.title+' '+x.r.city+' '+x.r.category).includes(query));
  if(sort==='new')shown.sort((a,b)=>new Date(b.r.created_at)-new Date(a.r.created_at));
@@ -986,7 +987,7 @@ function renderAdminPanel(){
 }
 async function adminViewRequest(id){
  let r=requests.find(x=>x.id===id);
- if(!r){const {data,error}=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision').eq('id',id).maybeSingle();if(error||!data)return toast('Заявка недоступна');r=data}
+ if(!r){const {data,error}=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at').eq('id',id).maybeSingle();if(error||!data)return toast('Заявка недоступна');r=data}
  if(!requests.some(x=>x.id===id))requests.unshift(r);
  showRequest(id);
 }

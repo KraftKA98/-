@@ -2,21 +2,21 @@
 const auctionFeedSummaries=new Map(),auctionFeedSeen=new Map(),auctionFeedLatest=new Map();
 const auctionFeedFilters={home:{only:false,soon:false},catalog:{only:false,soon:false}};
 let auctionFeedTimer=null,auctionFeedLoading=false,auctionFeedError='',auctionFeedSequence=0;
-function auctionPublicIds(){return [...new Set(requests.filter(r=>r.status==='open'&&!r.is_hidden).map(r=>r.id))]}
+function auctionPublicIds(){return [...new Set(requests.filter(r=>r.status==='open'&&!r.is_hidden&&requestIsCurrent(r)).map(r=>r.id))]}
 function auctionFeedPhase(summary){return summary?.status==='active'&&auctionRemaining(summary)>0?'active':summary?.status==='active'?'ended':summary?.status||'none'}
 function rememberAuctionSummary(state){
  const request=requests.find(r=>r.id===state.request_id),previous=auctionFeedSummaries.get(state.request_id),latest=auctionFeedLatest.get(state.request_id);
  if(latest&&Date.parse(latest)>Date.parse(state.server_now))return;auctionFeedLatest.set(state.request_id,state.server_now);
- if(!request||request.status!=='open'||request.is_hidden||!['active','ended'].includes(state.status)){auctionFeedSummaries.delete(state.request_id);return}
+ if(!request||request.status!=='open'||request.is_hidden||!requestIsCurrent(request)||!['active','ended'].includes(state.status)){auctionFeedSummaries.delete(state.request_id);return}
  if(previous&&Date.parse(previous.server_now)>Date.parse(state.server_now))return;
  auctionFeedSummaries.set(state.request_id,{request_id:state.request_id,status:state.status,best_price:state.best_price,offer_count:state.offer_count,min_step:state.min_step,ends_at:state.ends_at,server_now:state.server_now,clockOffset:state.clockOffset??Date.parse(state.server_now)-Date.now(),receivedAt:Date.now()});
 }
 function auctionFeedBadgeMarkup(request){
- if(request.status!=='open'||request.is_hidden)return '';const summary=auctionFeedSummaries.get(request.id);if(!summary)return '';
+ if(request.status!=='open'||request.is_hidden||!requestIsCurrent(request))return '';const summary=auctionFeedSummaries.get(request.id);if(!summary)return '';
  const phase=auctionFeedPhase(summary);
  return `<div class="feed-auction-badge" data-feed-auction="${esc(request.id)}"><b>${phase==='active'?'🔻 Идут торги':'Торги завершены'}</b><span>${summary.best_price==null?'Ставок пока нет':'Лучшая цена: '+money(summary.best_price)}</span>${phase==='active'?`<span class="small" data-feed-auction-clock="${esc(request.id)}">До конца: ${auctionTimeText(auctionRemaining(summary))}</span>`:'<span class="small">Покупатель выбирает продавца</span>'}</div>`;
 }
-function auctionFeedMatches(request,source){const filter=auctionFeedFilters[source];if(!filter?.only)return true;const summary=auctionFeedSummaries.get(request.id);return auctionFeedPhase(summary)==='active'&&(!filter.soon||auctionRemaining(summary)<=86400000)}
+function auctionFeedMatches(request,source){const filter=auctionFeedFilters[source];if(!filter?.only)return true;if(!requestIsCurrent(request))return false;const summary=auctionFeedSummaries.get(request.id);return auctionFeedPhase(summary)==='active'&&(!filter.soon||auctionRemaining(summary)<=86400000)}
 function setAuctionFeedFilter(source,key,value){
  const f=auctionFeedFilters[source];if(!f||!['only','soon'].includes(key))return;f[key]=!!value;if(key==='soon'&&value)f.only=true;if(key==='only'&&!value)f.soon=false;
  source==='home'?renderHomeFeed():renderCatalog();scheduleAuctionFeedLoad();
@@ -90,7 +90,7 @@ async function openMyAuctionAction(id,action){
  if(!requireAuth())return;const owner=user.id,row=myAuctionView.rows.find(r=>r.request_id===id);if(!row)return;
  try{
   if(action==='request'){
-   const {data,error}=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision').eq('id',id).maybeSingle();if(error)throw error;if(!data||data.is_hidden)throw Error('Желание недоступно');if(user?.id!==owner)return;
+   const {data,error}=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at').eq('id',id).maybeSingle();if(error)throw error;if(!data||data.is_hidden)throw Error('Желание недоступно');if(user?.id!==owner)return;
    const existing=requests.find(r=>r.id===id);existing?Object.assign(existing,data):requests.push(data);showRequest(id);return;
   }
   const {data,error}=await db.from('offers').select('id,request_id,seller_id,price,description,created_at').eq('id',row.own_offer.id).maybeSingle();if(error)throw error;if(!data||data.seller_id!==owner)throw Error('Предложение недоступно');if(user?.id!==owner)return;

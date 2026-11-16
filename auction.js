@@ -4,7 +4,7 @@ function auctionKey(id){return (user?.id||'guest')+':'+id}
 function cachedAuction(id){return auctionStates.get(auctionKey(id))}
 function auctionRemaining(state,now=Date.now()){return Math.max(0,Date.parse(state.ends_at)-(now+(state.clockOffset||0)))}
 function auctionTimeText(ms){const sec=Math.ceil(ms/1000),h=Math.floor(sec/3600),m=Math.floor(sec%3600/60);return h+' ч '+m+' мин '+sec%60+' с'}
-function auctionSelectionAllowed(id){const state=cachedAuction(id);return !state||['none','ended'].includes(state.status)||(state.status==='active'&&auctionRemaining(state)===0)}
+function auctionSelectionAllowed(id){const request=typeof requests==='undefined'?null:requests.find(r=>r.id===id);if(request&&typeof requestIsCurrent==='function'&&!requestIsCurrent(request))return false;const state=cachedAuction(id);return !state||['none','ended'].includes(state.status)||(state.status==='active'&&auctionRemaining(state)===0)}
 function auctionStore(state,owner=user?.id){
  if(!state||!['none','active','ended','closed','selected'].includes(state.status)||!state.request_id)throw Error('Не удалось проверить состояние торгов');
  const key=owner+':'+state.request_id,previous=auctionStates.get(key);
@@ -22,6 +22,7 @@ async function auctionRead(id){
 function auctionError(error){return ['PGRST202','42883'].includes(error.code)?'Обновите страницу: сервер торгов пока недоступен.':error.message||'Не удалось загрузить торги'}
 function auctionPanelMarkup(request){return request&&user?`<section class="auction-panel" data-auction-panel data-request-id="${esc(request.id)}"><p class="small muted">Проверяем торги…</p></section>`:''}
 function auctionPanelContent(request,state){
+ if(typeof requestIsCurrent==='function'&&!requestIsCurrent(request))return state.status==='none'?'':'<p class="small muted">Срок желания истёк. Новые ставки не принимаются; продление желания не перезапускает торги.</p>';
  const mine=request.buyer_id===user?.id;
  if(state.status==='none')return mine&&request.status==='open'&&!request.is_hidden&&!offers.some(o=>o.request_id===request.id)&&!deals.some(d=>d.request_id===request.id)?`<h3>Торги между продавцами</h3><p class="small muted">Продавцы смогут снижать цену. Выбор продавца — за вами после окончания торгов.</p><button class="btn ghost block" onclick="openAuctionSetup('${request.id}')">Включить торги</button>`:'';
  const active=state.status==='active'&&auctionRemaining(state)>0;
@@ -67,7 +68,7 @@ async function loadAuctionPanel(id){
 function openAuctionSetup(id){
  if(!requireAuth())return;const request=requests.find(r=>r.id===id);if(!request||request.buyer_id!==user.id)return;
  modal({title:'Включить торги',body:`<p>${esc(request.title)} · бюджет ${money(request.budget)}</p><form id="auctionSetupForm"><label class="fieldset"><span class="fieldlabel">Продолжительность</span><select class="field" name="hours"><option value="1">1 час</option><option value="6">6 часов</option><option value="24" selected>24 часа</option><option value="48">48 часов</option><option value="72">3 дня</option><option value="168">7 дней</option></select></label><label class="fieldset"><span class="fieldlabel">Минимальный шаг снижения, ₽</span><input class="field" name="step" type="number" min="0.01" max="${esc(Number(request.budget)-0.01)}" step="0.01" value="${Math.min(100,Math.max(0.01,Math.floor(Number(request.budget)/100)))}" required></label><p class="small muted">Включается до первого предложения. Первую цену ограничивает бюджет, следующие должны быть ниже лучшей минимум на шаг. После запуска срок, шаг и условия желания нельзя изменить. Выбрать продавца можно после окончания. Можно закрыть желание и остановить приём ставок.</p><p class="small muted">Соревнуются цены предложений. Доставка, состояние и гарантия сравниваются отдельно. Победитель не назначается автоматически.</p><p class="small" role="alert"></p><button type="submit" class="btn block">Начать торги</button></form>`});
- const form=$('auctionSetupForm');if(form)form.addEventListener('submit',event=>startRequestAuction(event,id));
+ const form=$('auctionSetupForm');if(typeof requestLifetimeConstrainAuction==='function')requestLifetimeConstrainAuction(form,request);if(form)form.addEventListener('submit',event=>startRequestAuction(event,id));
 }
 async function startRequestAuction(event,id){
  event.preventDefault();const form=event.currentTarget;if(form.dataset.busy||!requireAuth())return;
@@ -84,6 +85,7 @@ async function openAuctionBidOrChat(offer){
 async function openAuctionBid(id,provided){
  if(!requireAuth())return;const owner=user.id,offer=offers.find(o=>o.id===id&&o.seller_id===owner);if(!offer)return toast('Ваше предложение недоступно');
  try{
+  if(typeof ensureCurrentRequestLifetime==='function')await ensureCurrentRequestLifetime(offer.request_id);
   const state=provided||await auctionRead(offer.request_id);if(user?.id!==owner)return;
   if(state.status!=='active'||!state.can_bid||auctionRemaining(state)===0||state.own_offer_id!==id)throw Error('Снижение цены сейчас недоступно. Обновите торги');
   modal({title:'Снизить свою цену',body:`<p>Ваша цена: ${money(state.own_price)}<br>Лучшая цена: ${money(state.best_price)}<br>Шаг: ${money(state.min_step)}</p><form id="auctionBidForm"><label class="fieldset"><span class="fieldlabel">Новая цена, ₽</span><input class="field" name="price" type="number" required min="1" max="${esc(state.max_next_price)}" step="0.01" value="${esc(state.max_next_price)}"></label><p class="small muted">Доставку, гарантию, фотографии и описание эта ставка не меняет. Вернуть прежнюю цену нельзя. До ${esc(new Date(state.ends_at).toLocaleString('ru-RU'))}.</p><p class="small" role="alert"></p><button type="submit" class="btn block">Подтвердить снижение</button><button type="button" class="btn ghost block" style="margin-top:8px" onclick="openAuctionBid('${id}')">Обновить лучшую цену</button></form>`});

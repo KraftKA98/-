@@ -6,7 +6,7 @@ function clearRequestEditor(){
   for(const item of requestEditorState?.files||[])URL.revokeObjectURL(item.url);
   requestEditorState=null;return true;
 }
-function editableWish(request){return !!request&&request.buyer_id===user?.id&&request.status==='open'&&!request.is_hidden&&!deals.some(deal=>deal.request_id===request.id)}
+function editableWish(request){return !!request&&request.buyer_id===user?.id&&request.status==='open'&&!request.is_hidden&&(typeof requestIsCurrent!=='function'||requestIsCurrent(request))&&!deals.some(deal=>deal.request_id===request.id)}
 function requestPhotoPaths(request){return Array.isArray(request?.image_paths)?request.image_paths.filter(path=>typeof path==='string').slice(0,5):[]}
 function requestPhotosMarkup(request,cover=false){
   const paths=requestPhotoPaths(request);if(!paths.length)return '';
@@ -115,12 +115,12 @@ async function submitRequestEditor(event){
   const controlStates=[...form.elements].map(control=>[control,control.disabled]);
   let uploaded=[],createdNow=false;
   try{
-    record.description=requestDescription(values,record.category);validateRequestRecord(record,state.original);
+    record.description=requestDescription(values,record.category);validateRequestRecord(record,state.original);if(!state.editing){record.valid_for_days=Number(values.get('valid_for_days')||30);if(![7,14,30,90].includes(record.valid_for_days))throw Error('Проверьте срок актуальности')}
     state.busy=true;for(const [control] of controlStates)control.disabled=true;
     if(!state.editing){
       const {error}=await db.from('requests').insert({...record,image_paths:[]});
       if(error)throw error;
-      createdNow=true;state.editing=true;state.original={...record,image_paths:[],revision:0,status:'open',is_hidden:false,created_at:new Date().toISOString()};
+      createdNow=true;state.editing=true;state.original={...record,...(typeof requestLifetimeCreatedFields==='function'?requestLifetimeCreatedFields(record.valid_for_days):{}),image_paths:[],revision:0,status:'open',is_hidden:false,created_at:new Date().toISOString()};
     }
     let failed=0;
     for(const item of state.files){
