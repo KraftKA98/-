@@ -122,6 +122,8 @@ h2{font-size:21px;letter-spacing:-.5px}.hero{border-radius:25px;padding:21px 20p
 .trust-review{background:#fdfdf9;border-color:var(--line)}
 .trust-summary{background:#edf1e9;border-color:#dfe4d9}
 @media(max-width:400px){.trust-kpis strong{font-size:20px}}
+
+.offer-comparison{border-collapse:collapse;width:100%;min-width:620px}.offer-comparison th,.offer-comparison td{padding:12px;border:1px solid #d8e2d5;text-align:left;vertical-align:top;min-width:170px}.offer-comparison th{background:#edf1e9}.offer-comparison td{max-width:280px}.offer-comparison .btn{white-space:normal}
 </style>
 <script src="./config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head><body><div class="app"><header><div class="brand">ХОЧУ<b>.</b></div><div class="row"><span class="tag">ХОЧУ · v23.8.0</span><button onclick="openNotifications()" aria-label="Уведомления" class="btn ghost" style="padding:8px 10px">🔔 <span id="unreadBadge" style="display:none">0</span></button><button onclick="refreshAll()" aria-label="Обновить" class="btn gray" style="padding:8px 10px">↻</button></div></header>
@@ -144,7 +146,7 @@ h2{font-size:21px;letter-spacing:-.5px}.hero{border-radius:25px;padding:21px 20p
 <div class="mobile-filter-label">Сортировка</div><div id="catalogSortChoicesV2321" class="mobile-sort-options" role="group" aria-label="Сортировка"></div>
 </div><div class="mobile-filter-footer"><button type="button" class="btn ghost" onclick="resetCatalogFiltersV2321()">Сбросить</button><button type="button" class="btn" onclick="applyCatalogFiltersV2321()">Показать желания</button></div>
 </section></div><div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()"><div class="modal" id="modal"></div></div><div id="toast" class="toast"></div>
-<script src="./categories.js"></script>
+<script src="./categories.js"></script><script src="./request-tools.js"></script>
 <script>
 'use strict';
 
@@ -258,7 +260,7 @@ function renderHomeFeed(){
  else if(sort==='expensive')current.sort((a,b)=>Number(b.budget)-Number(a.budget));
  else current.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
  const counter=$('homeFeedCountV231');if(counter)counter.textContent=`Найдено желаний: ${current.length}${current.length>20?' · показаны первые 20':''}`;
- host.innerHTML=current.length?current.slice(0,20).map(requestCard).join(''):'<div class="empty">По выбранным фильтрам желаний нет. Измени параметры поиска.</div>';
+ host.innerHTML=current.length?current.slice(0,20).map(requestCard).join(''):emptyWishMarkup('home');
 }
 function renderAll(){const current=publicRequests();$('countRequests').textContent=current.length;renderHomeFeed();renderCatalog();renderActivity();renderProfile();renderInbox()}
 function requestCard(r){
@@ -323,7 +325,7 @@ function renderCatalog(){
  if(f.sort==='cheap')a.sort((x,y)=>Number(x.budget)-Number(y.budget));
  else if(f.sort==='expensive')a.sort((x,y)=>Number(y.budget)-Number(x.budget));
  else a.sort((x,y)=>new Date(y.created_at)-new Date(x.created_at));
- $('catalogRequests').innerHTML=a.length?a.map(requestCard).join(''):'<div class="empty">По этому запросу ничего не найдено</div>';
+ $('catalogRequests').innerHTML=a.length?a.map(requestCard).join(''):emptyWishMarkup('catalog');
  const summary=$('catalogFilterSummary');
  if(summary)summary.textContent=`${f.category||'Все категории'} · ${f.sort==='new'?'Новые':f.sort==='cheap'?'Дешёвые':'Дорогие'} · ${a.length} заявок`;
 }
@@ -362,8 +364,8 @@ async function saveProfile(e){
   closeModal();await refreshAll();toast('Профиль сохранён');
  }catch(err){toast('Не удалось сохранить: '+err.message)}finally{btn.disabled=false}
 }
-function openRequest(){if(!requireAuth())return;modal({title:'Новая заявка',body:`<form onsubmit="createRequest(event)"><div class="fieldset"><label class="fieldlabel">Что вы ищете?</label><input class="field" name="title" maxlength="120" minlength="4" required placeholder="Например, iPhone 16 Pro"></div><div class="fieldset"><label class="fieldlabel">Категория</label>${categoryPicker()}</div><div class="fieldset"><label class="fieldlabel">Бюджет, ₽</label><input class="field" type="number" min="1" max="1000000000" step="1" name="budget" required></div><div class="fieldset"><label class="fieldlabel">Город</label><input class="field" name="city" minlength="2" maxlength="100" required value="${esc(profile?.city||'')}"></div><div class="fieldset"><label class="fieldlabel">Подробности</label><textarea class="field" name="description" maxlength="2000" placeholder="Состояние, характеристики, сроки…"></textarea></div><button class="btn block">Опубликовать запрос</button></form>`})}
-async function createRequest(e){e.preventDefault();if(!requireAuth()||!startAction('request:create'))return;const f=new FormData(e.target);const rec={buyer_id:user.id,title:String(f.get('title')).trim(),category:String(f.get('category')),budget:Number(f.get('budget')),city:String(f.get('city')).trim(),description:String(f.get('description')||'').trim()};try{if(!isKnownCategory(rec.category))throw Error('Выбери категорию из списка');if(rec.title.length<4||!Number.isFinite(rec.budget)||rec.budget<1||rec.budget>1000000000||rec.city.length<2)throw Error('Проверь название, город и бюджет');const {error}=await db.from('requests').insert(rec);if(error)throw error;closeModal();await refreshAll();navigate('activity');toast('Заявка опубликована!')}catch(err){toast('Не удалось опубликовать: '+(err.message||err))}finally{endAction('request:create')}}
+function openRequest(prefill={}){if(!requireAuth())return;modal({title:'Новое желание',body:requestFormMarkup(prefill)});refreshRequestBudget($('modal').querySelector('form'))}
+async function createRequest(e){e.preventDefault();if(!requireAuth()||!startAction('request:create'))return;const f=new FormData(e.target);const rec={buyer_id:user.id,title:String(f.get('title')).trim(),category:String(f.get('category')),budget:Number(f.get('budget')),city:String(f.get('city')).trim(),description:''};try{rec.description=requestDescription(f,rec.category);if(!isKnownCategory(rec.category))throw Error('Выбери категорию из списка');if(rec.title.length<4||!Number.isFinite(rec.budget)||rec.budget<1||rec.budget>1000000000||rec.city.length<2)throw Error('Проверь название, город и бюджет');const {error}=await db.from('requests').insert(rec);if(error)throw error;closeModal();await refreshAll();navigate('activity');toast('Заявка опубликована!')}catch(err){toast('Не удалось опубликовать: '+(err.message||err))}finally{endAction('request:create')}}
 function showRequest(id){
  const r=requests.find(x=>x.id===id);if(!r)return;
  const mine=r.buyer_id===user?.id,star=favorites.has(id),deal=deals.find(d=>d.request_id===id);
@@ -386,7 +388,11 @@ async function loadRequestOffers(id){
  const target=$('requestOffers');if(!target)return;
  if(!user){target.innerHTML='<p class="muted">Войди, чтобы увидеть предложения, адресованные тебе.</p>';return}
  const a=offers.filter(o=>o.request_id===id);
- target.innerHTML=a.length?a.map(offerCard).join(''):'<div class="empty">Предложений пока нет</div>';
+ if(comparisonRequestId!==id){comparisonRequestId=id;comparisonOfferIds=new Set()}
+ const mine=requests.find(r=>r.id===id)?.buyer_id===user.id;
+ comparisonOfferIds=new Set([...comparisonOfferIds].filter(key=>a.some(o=>o.id===key)));
+ const compare=mine&&a.length>1;
+ target.innerHTML=a.length?(compare?`<p class="small muted">Отметьте 2–3 предложения, чтобы сравнить цену, условия и фотографии.</p><button id="compareOffersButton" class="btn block" style="margin-bottom:12px" onclick="openOfferComparison()" ${comparisonOfferIds.size<2?'disabled':''}>Сравнить (${comparisonOfferIds.size}/3)</button>`:'')+a.map(o=>(compare?`<label class="row small" style="padding:8px 0"><input type="checkbox" value="${esc(o.id)}" ${comparisonOfferIds.has(o.id)?'checked':''} onchange="toggleOfferComparison(this)"> В сравнение · ${money(o.price)}</label>`:'')+offerCard(o)).join(''):'<div class="empty">Предложений пока нет</div>';
  for(const o of a)await loadOfferGallery(o.id);
 }
 function openOffer(id){

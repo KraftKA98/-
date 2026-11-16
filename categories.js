@@ -64,6 +64,7 @@ function changeCategoryPicker(select,parentChanged){
   }
   const value=parentChanged?parent:child.value;
   picker.querySelector('.category-value').value=value;
+  if(typeof refreshRequestFields==='function')refreshRequestFields(picker);
   const callback=picker.dataset.onchange;
   if(callback==='setHomeCategoryV232')setHomeCategoryV232(value);
   if(callback==='chooseCatalogCategoryV2321')chooseCatalogCategoryV2321(value);
