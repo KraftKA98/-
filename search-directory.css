@@ -13,3 +13,5 @@
 .car-brand-badge img{display:block;width:30px;height:30px;object-fit:contain}
 .directory-selected{display:flex;gap:10px;align-items:center;margin-top:8px;color:#36513c;font-size:13px}.directory-selected[hidden]{display:none!important}
 .wish-avatar .car-brand-badge{border:0}
+
+.product-brand-badge.is-monogram{border-style:dashed;background:#f3f6ef;color:#53684c;letter-spacing:.3px}.product-brand-badge:not(.is-monogram){background:#fff}

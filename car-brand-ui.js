@@ -49,7 +49,7 @@ function applyCarLogos(){
   });
 }
 function carBrandBadge(brand,category){
-  if(!['Авто','Легковые автомобили','Аренда транспорта'].includes(category))return '';
+  if(categoryGroup(category)?.[1]!=='Авто'||['Водный транспорт','Мотоциклы и мототехника'].includes(category))return '';
   const record=carBrandByName.get(canonicalBrand(brand));if(!record)return '';
   loadCarLogos().then(()=>applyCarLogos());
   return `<span class="car-brand-badge" role="img" aria-label="${categoryEscape(record.name)}" data-car-logo="${categoryEscape(record.slug)}">${categoryEscape(record.name.slice(0,2))}</span>`;

@@ -68,7 +68,7 @@ function attachDirectory(input){
   const list=document.createElement('div');list.id='directory-options-'+(++directorySequence);list.className='directory-options';list.role='listbox';list.hidden=true;wrapper.append(list);
   const preview=document.createElement('div');preview.className='directory-selected';preview.hidden=true;wrapper.append(preview);
   function showSelection(){
-    const badge=!city?carBrandBadge(input.value,directoryCategory(input)):'';
+    const badge=!city?brandBadge(input.value,directoryCategory(input)):'';
     preview.innerHTML=badge?badge+'<span>'+categoryEscape(canonicalBrand(input.value))+'</span>':'';preview.hidden=!badge;
   }
   input.addEventListener('input',showSelection);showSelection();
@@ -86,7 +86,7 @@ function attachDirectory(input){
   }
   function draw(){
     results=city?searchCities(input.value):searchBrands(input.value,directoryCategory(input));active=-1;
-    list.innerHTML=results.map((result,i)=>`<div role="option" aria-selected="false" id="${list.id}-${i}" data-option="${i}" class="directory-option">${!city?carBrandBadge(result.value,directoryCategory(input)):''}<div><strong>${categoryEscape(result.label)}</strong>${result.detail?`<span>${categoryEscape(result.detail)}</span>`:''}</div></div>`).join('')+`<div class="directory-hint" role="presentation">${results.length?(results.length===30?'Уточните название, чтобы сузить список.':'Выберите вариант из списка.'):'Совпадений нет. Можно ввести название вручную.'}</div>`;
+    list.innerHTML=results.map((result,i)=>`<div role="option" aria-selected="false" id="${list.id}-${i}" data-option="${i}" class="directory-option">${!city?brandBadge(result.value,directoryCategory(input)):''}<div><strong>${categoryEscape(result.label)}</strong>${result.detail?`<span>${categoryEscape(result.detail)}</span>`:''}</div></div>`).join('')+`<div class="directory-hint" role="presentation">${results.length?(results.length===30?'Уточните название, чтобы сузить список.':'Выберите вариант из списка.'):'Совпадений нет. Можно ввести название вручную.'}</div>`;
     list.hidden=false;input.setAttribute('aria-expanded','true');input.removeAttribute('aria-activedescendant');
     requestAnimationFrame(()=>{if(document.activeElement===input&&!list.hidden)list.scrollIntoView({block:'nearest'})});
   }
