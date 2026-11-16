@@ -47,13 +47,14 @@ function refreshGenericBrandFields(picker){
   const category=picker.querySelector('[name="category"]').value;
   const previous=host.querySelector('input')?.value||'';
   const keep=brandsForCategory(category).includes(canonicalBrand(previous));
-  host.innerHTML=category&&categoryHasBrand(category)?brandFieldMarkup(category,keep?previous:''):'';
+  host.innerHTML=category&&categoryHasBrand(category)?brandFieldMarkup(category,keep?previous:'')+genericModelMarkup(category):'';
 }
 function descriptionWithBrand(formData,category,limit=2000){
   const brand=String(formData.get('detail_brand')||'').trim();
   if(brand.length>80||/[\r\n]/.test(brand))throw Error('Проверьте название бренда (до 80 символов)');
   const prefix=brand&&categoryHasBrand(category)?'Бренд / марка: '+canonicalBrand(brand):'';
-  const text=[prefix,String(formData.get('description')||'').trim()].filter(Boolean).join('\n\n');
+  const metadata=[prefix,genericModelDescription(formData,category)].filter(Boolean).join('\n');
+  const text=[metadata,String(formData.get('description')||'').trim()].filter(Boolean).join('\n\n');
   if(text.length>limit)throw Error('Сократите описание вместе с брендом до '+limit+' символов');
   return text;
 }

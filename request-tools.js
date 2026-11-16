@@ -18,12 +18,16 @@ function requestFieldDefinitions(category){
   if(['Электроника','Компьютеры','Авто','Бытовая техника','Инструменты','Сад','Бизнес и оборудование'].includes(group))fields.unshift(['model','Модель','text']);
   if(group==='Электроника'||group==='Компьютеры')fields.push(['specs','Память и важные характеристики','text']);
   if(group==='Авто')fields.push(['year','Год выпуска от','number'],['mileage','Пробег до, км','number']);
+  if(isCarModelCategory(category))return [['model','Модель','text'],['generation','Поколение','text'],['year','Год выпуска от','number'],['mileage','Пробег до, км','number'],['gearbox','Коробка передач','select',['Механическая','Автоматическая','Робот','Вариатор','Не имеет значения']],...fields.filter(field=>!['model','year','mileage'].includes(field[0]))];
+  if(isPhoneModelCategory(category)){fields.splice(1,0,['storage','Встроенная память','text']);for(const field of fields)if(field[0]==='specs')field[1]='Другие характеристики'}
   return fields;
+}
+function requestDetailFieldMarkup([key,label,type,options],category){
+  return `<label class="fieldset" style="display:block"><span class="fieldlabel">${esc(label)}</span>${type==='select'?`<select class="field" name="detail_${key}"><option value="">Не указано</option>${options.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('')}</select>`:`<input class="field" name="detail_${key}" type="${type}" ${modelFieldAttributes(key,category)} ${type==='number'?'min="0" max="1000000000" step="1"':type==='text'?'maxlength="120"':''}>`}</label>`;
 }
 function requestDetailsMarkup(category,brand=''){
   if(!category)return '<p class="small muted">Выберите категорию — появятся подсказки для вашего желания.</p>';
-  return '<p class="small muted">Уточните важное, чтобы получать подходящие предложения. Эти поля необязательные.</p>'+`<div data-request-brand>${brandFieldMarkup(category,brand)}</div>`+requestFieldDefinitions(category).map(([key,label,type,options])=>
-    `<label class="fieldset" style="display:block"><span class="fieldlabel">${esc(label)}</span>${type==='select'?`<select class="field" name="detail_${key}"><option value="">Не указано</option>${options.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('')}</select>`:`<input class="field" name="detail_${key}" type="${type}" ${type==='number'?'min="0" max="1000000000" step="1"':type==='text'?'maxlength="120"':''}>`}</label>`).join('');
+  return '<p class="small muted">Уточните важное, чтобы получать подходящие предложения. Эти поля необязательные.</p>'+`<div data-request-brand>${brandFieldMarkup(category,brand)}</div>`+requestFieldDefinitions(category).map(field=>requestDetailFieldMarkup(field,category)).join('');
 }
 function refreshRequestFields(picker){
   const form=picker.closest('form');if(!form?.querySelector('[data-request-details]'))return;
@@ -31,7 +35,17 @@ function refreshRequestFields(picker){
   const details=form.querySelector('[data-request-details]');
   // Retain values shared by subcategories in the same main section.
   const group=categoryGroup(category)?.[1]||'';
-  if(details.dataset.group!==group){details.innerHTML=requestDetailsMarkup(category);details.dataset.group=group}
+  const previousCategory=details.querySelector('[name="detail_brand"]')?.dataset.category||'';
+  const signature=JSON.stringify(requestFieldDefinitions(category));
+  if(details.dataset.group!==group||details.dataset.fieldSignature!==signature){
+    const previous=details.dataset.group===group?Object.fromEntries([...details.querySelectorAll('[name^="detail_"]')].map(field=>[field.name,field.value])):{};
+    const sameKind=modelCategoryKind(previousCategory)===modelCategoryKind(category);
+    details.innerHTML=requestDetailsMarkup(category);details.dataset.group=group;details.dataset.fieldSignature=signature;
+    for(const [name,value] of Object.entries(previous)){
+      if(!sameKind&&['detail_model','detail_generation','detail_storage'].includes(name))continue;
+      const field=details.querySelector(`[name="${name}"]`);if(field)field.value=value;
+    }
+  }
   const brandHost=details.querySelector('[data-request-brand]');
   if(brandHost){
     const input=brandHost.querySelector('input');
@@ -60,6 +74,7 @@ function requestDescription(formData,category){
   for(const [key,label,type,options] of requestFieldDefinitions(category)){
     const value=String(formData.get('detail_'+key)||'').trim();if(!value)continue;
     if(value.length>120||(type==='select'&&!options.includes(value)))throw Error('Проверьте характеристики');
+    if(key==='year'&&(Number(value)<1886||Number(value)>new Date().getFullYear()+1))throw Error('Проверьте год выпуска');
     if(type==='number'&&(!Number.isFinite(Number(value))||Number(value)<0||Number(value)>1000000000))throw Error('Проверьте числовые характеристики');
     if(type==='date'&&!/^\d{4}-\d{2}-\d{2}$/.test(value))throw Error('Проверьте дату');
     lines.push(label+': '+value);
@@ -81,7 +96,7 @@ function requestFormMarkup(prefill={}){
     <label class="fieldset" style="display:block"><span class="fieldlabel" data-budget-label>Бюджет до, ₽</span><input class="field" type="number" min="1" max="1000000000" step="1" name="budget" required value="${esc(prefill.budget||'')}"></label>
     <label class="fieldset" style="display:block"><span class="fieldlabel">Город</span><input class="field" name="city" minlength="2" maxlength="100" required value="${esc(prefill.city||profile?.city||'')}"></label>
     <label class="fieldset" style="display:block"><span class="fieldlabel">Дополнительные пожелания</span><textarea class="field" name="description" maxlength="2000" placeholder="Что ещё важно?">${esc(prefill.description||'')}</textarea></label>
-    <p class="small muted">Характеристики войдут в описание. Общая длина — до 2000 символов.</p>
+    ${requestPhotoEditorMarkup()}<p class="small muted">Характеристики войдут в описание. Общая длина — до 2000 символов.</p>
     <button class="btn block" type="submit">Опубликовать запрос</button></form>`;
 }
 function createWishFromSearch(source){
@@ -90,11 +105,11 @@ function createWishFromSearch(source){
   const category=home?homeCategorySelectedV232:catalogFilterV2321.category;
   const city=home?$('homeCityV231')?.value.trim():catalogFilterV2321.city;
   if(!requireAuth())return;
-  openRequest({title,category,city,brand:home?homeBrandFilter:catalogFilterV2321.brand});
+  openRequest({title,category,city,brand:home?homeBrandFilter:catalogFilterV2321.brand,details:{model:home?homeModelFilter:catalogFilterV2321.model||''}});
 }
 function resetEmptySearch(source){
   if(source==='home'){resetHomeFiltersV231();return}
-  $('search').value='';Object.assign(catalogFilterV2321,{category:'',city:'',brand:'',min:'',max:'',sort:'new'});renderCatalog();
+  $('search').value='';Object.assign(catalogFilterV2321,{category:'',city:'',brand:'',model:'',min:'',max:'',sort:'new'});renderCatalog();
 }
 function emptyWishMarkup(source){
   return `<div class="empty"><h3>Такого желания пока нет</h3><p>Расскажите, что ищете, — продавцы смогут предложить варианты.</p><div class="row" style="justify-content:center;flex-wrap:wrap"><button class="btn" onclick="createWishFromSearch('${source}')">Создать такое желание</button><button class="btn ghost" onclick="resetEmptySearch('${source}')">Сбросить фильтры</button></div></div>`;

@@ -41,8 +41,9 @@ function requestSearchMatches(request,query){
 }
 let homeBrandFilter='';
 function updateBrandFilter(input,source){
-  if(source==='home'){homeBrandFilter=input.value;renderHomeFeed()}
-  else if(catalogDraftV2321)catalogDraftV2321.brand=input.value;
+  if(source==='home'){homeBrandFilter=input.value;homeModelFilter='';renderHomeFeed()}
+  else if(catalogDraftV2321){catalogDraftV2321.brand=input.value;catalogDraftV2321.model=''}
+  const model=input.closest('#homeBrandField,#catalogBrandField')?.querySelector('[name=filterModel]');if(model)model.value='';
 }
 function brandFieldMarkup(category,value='',source=''){
   if(!categoryHasBrand(category)&&category)return '';
@@ -54,26 +55,26 @@ function refreshBrandFilter(source){
   if(!host)return;
   const category=home?homeCategorySelectedV232:catalogDraftV2321?.category||'';
   const value=home?homeBrandFilter:catalogDraftV2321?.brand||'';
-  host.innerHTML=brandFieldMarkup(category,value,source);
+  host.innerHTML=brandFieldMarkup(category,value,source)+modelFilterMarkup(category,value,home?homeModelFilter:catalogDraftV2321?.model||'',source);
 }
 function directoryCategory(input){return input.dataset.category||input.closest('form')?.querySelector('[name="category"]')?.value||''}
 let directorySequence=0;
 function attachDirectory(input){
   if(input.dataset.directoryReady)return;
   input.dataset.directoryReady='true';
-  const city=input.dataset.directory==='city';
+  const kind=input.dataset.directory,city=kind==='city',brand=kind==='brand';
   const wrapper=document.createElement('div');wrapper.className='directory-picker';
-  wrapper.dataset.kind=city?'city':'brand';
+  wrapper.dataset.kind=kind;
   input.before(wrapper);wrapper.append(input);
   const list=document.createElement('div');list.id='directory-options-'+(++directorySequence);list.className='directory-options';list.role='listbox';list.hidden=true;wrapper.append(list);
   const preview=document.createElement('div');preview.className='directory-selected';preview.hidden=true;wrapper.append(preview);
   function showSelection(){
-    const badge=!city?brandBadge(input.value,directoryCategory(input)):'';
+    const badge=brand?brandBadge(input.value,directoryCategory(input)):'';
     preview.innerHTML=badge?badge+'<span>'+categoryEscape(canonicalBrand(input.value))+'</span>':'';preview.hidden=!badge;
   }
   input.addEventListener('input',showSelection);showSelection();
   input.setAttribute('role','combobox');input.setAttribute('aria-autocomplete','list');input.setAttribute('aria-controls',list.id);input.setAttribute('aria-expanded','false');input.autocomplete='off';
-  if(!input.getAttribute('aria-label')&&!input.id)input.setAttribute('aria-label',city?'Город':'Бренд / марка');
+  if(!input.getAttribute('aria-label')&&!input.id)input.setAttribute('aria-label',city?'Город':brand?'Бренд / марка':kind==='model'?'Модель':kind==='generation'?'Поколение':'Встроенная память');
   let results=[],active=-1;
   function close(){list.hidden=true;input.setAttribute('aria-expanded','false');input.removeAttribute('aria-activedescendant');active=-1}
   function highlight(){
@@ -86,20 +87,22 @@ function attachDirectory(input){
   }
   function draw(showAll=false){
     const query=showAll===true?'':input.value;
-    results=city?searchCities(query):searchBrands(query,directoryCategory(input));active=-1;
-    const summary=!city?`<div class="directory-summary" role="presentation">${directoryNormalize(query)?'Найдено брендов':'Все бренды'}: ${results.length} · можно прокручивать</div>`:'';
-    list.innerHTML=summary+results.map((result,i)=>`<div role="option" aria-selected="false" id="${list.id}-${i}" data-option="${i}" class="directory-option">${!city?brandBadge(result.value,directoryCategory(input)):''}<div><strong>${categoryEscape(result.label)}</strong>${result.detail?`<span>${categoryEscape(result.detail)}</span>`:''}</div></div>`).join('')+`<div class="directory-hint" role="presentation">${results.length?(city&&results.length===30?'Уточните название, чтобы сузить список.':'Выберите вариант из списка.'):'Совпадений нет. Можно ввести название вручную.'}</div>`;
+    results=city?searchCities(query):brand?searchBrands(query,directoryCategory(input)):searchModelField(input,query);active=-1;
+    const summary=!city?`<div class="directory-summary" role="presentation">${brand?(directoryNormalize(query)?'Найдено брендов':'Все бренды'):kind==='model'?'Модели':kind==='generation'?'Поколения':'Варианты памяти'}: ${results.length} · можно прокручивать</div>`:'';
+    list.innerHTML=summary+results.map((result,i)=>`<div role="option" aria-selected="false" id="${list.id}-${i}" data-option="${i}" class="directory-option">${brand?brandBadge(result.value,directoryCategory(input)):''}<div><strong>${categoryEscape(result.label)}</strong>${result.detail?`<span>${categoryEscape(result.detail)}</span>`:''}</div></div>`).join('')+`<div class="directory-hint" role="presentation">${results.length?(city&&results.length===30?'Уточните название, чтобы сузить список.':'Выберите вариант из списка.'):'Совпадений нет. Можно ввести название вручную.'}</div>`;
     list.scrollTop=0;
     list.hidden=false;input.setAttribute('aria-expanded','true');input.removeAttribute('aria-activedescendant');
     requestAnimationFrame(()=>{if(document.activeElement===input&&!list.hidden)list.scrollIntoView({block:'nearest'})});
   }
   input.addEventListener('focus',()=>draw(!city));input.addEventListener('input',()=>draw());
   if(!city){
-    const browse=document.createElement('button');browse.type='button';browse.className='directory-browse';browse.textContent='Все бренды';browse.setAttribute('aria-controls',list.id);
+    const browse=document.createElement('button');browse.type='button';browse.className='directory-browse';browse.textContent=brand?'Все бренды':kind==='model'?'Все модели':kind==='generation'?'Все поколения':'Все варианты';browse.setAttribute('aria-controls',list.id);
     input.after(browse);
     browse.addEventListener('mousedown',event=>event.preventDefault());
     browse.addEventListener('click',()=>{input.focus();draw(true)});
   }
+  if(brand){syncModelControls(input);input.addEventListener('input',()=>syncModelControls(input,true))}
+  if(kind==='model'){const brandInput=(input.closest('#homeBrandField,#catalogBrandField')||input.closest('form'))?.querySelector('[name=filterBrand],[name=detail_brand]');if(brandInput)syncModelControls(brandInput);input.addEventListener('input',()=>syncModelDependents(input))}
   input.addEventListener('blur',close);
   list.addEventListener('mousedown',e=>e.preventDefault());
   list.addEventListener('click',e=>{const option=e.target.closest('[data-option]');if(option)choose(Number(option.dataset.option))});
