@@ -120,19 +120,4 @@ function toggleOfferComparison(input){
   input.checked?comparisonOfferIds.add(input.value):comparisonOfferIds.delete(input.value);
   const button=$('compareOffersButton');if(button){button.disabled=comparisonOfferIds.size<2;button.textContent='Сравнить ('+comparisonOfferIds.size+'/3)'}
 }
-function openOfferComparison(){
-  const request=requests.find(r=>r.id===comparisonRequestId);
-  if(!request||request.buyer_id!==user?.id)return;
-  const selected=offers.filter(o=>o.request_id===request.id&&comparisonOfferIds.has(o.id));
-  if(selected.length<2||selected.length>3)return;
-  const row=(label,render)=>`<tr><th scope="row">${label}</th>${selected.map((o,i)=>`<td>${render(o,i)}</td>`).join('')}</tr>`;
-  const deal=deals.find(d=>d.request_id===request.id);
-  modal({title:'Сравнение предложений',body:`<p>${esc(request.title)} · бюджет ${money(request.budget)}</p><p class="small muted">Прокрутите таблицу в сторону, чтобы увидеть все предложения.</p><div style="overflow-x:auto"><table class="offer-comparison"><thead><tr><th scope="col">Условия</th>${selected.map((o,i)=>`<th scope="col">Продавец ${i+1}<br><button class="mini-link" onclick="showSeller('${o.seller_id}')">Профиль и отзывы →</button></th>`).join('')}</tr></thead><tbody>
-    ${row('Цена',o=>`<strong>${money(o.price)}</strong>`)}
-    ${row('Относительно бюджета',o=>Number(o.price)<=Number(request.budget)?'В пределах бюджета':'Выше на '+money(Number(o.price)-Number(request.budget)))}
-    ${row('Характеристики и условия',o=>`<div style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(o.description)}</div>`)}
-    ${row('Фотографии',o=>offerImages.some(img=>img.offer_id===o.id)?`<div class="photo-grid" id="gallery-${o.id}">Загрузка фото…</div>`:'Не добавлены')}
-    ${row('Действия',o=>`<button class="btn ghost" onclick="openChat('${o.id}')">Переписка</button>${!deal&&request.status==='open'?`<button class="btn" style="margin-top:8px" onclick="selectOffer('${o.id}')">Выбрать продавца</button>`:''}`)}
-    </tbody></table></div><button class="btn ghost block" style="margin-top:16px" onclick="showRequest('${request.id}')">Вернуться к предложениям</button>`});
-  for(const offer of selected)loadOfferGallery(offer.id);
-}
+function openOfferComparison(){return openDetailedOfferComparison()}

@@ -126,7 +126,8 @@ h2{font-size:21px;letter-spacing:-.5px}.hero{border-radius:25px;padding:21px 20p
 .offer-comparison{border-collapse:collapse;width:100%;min-width:620px}.offer-comparison th,.offer-comparison td{padding:12px;border:1px solid #d8e2d5;text-align:left;vertical-align:top;min-width:170px}.offer-comparison th{background:#edf1e9}.offer-comparison td{max-width:280px}.offer-comparison .btn{white-space:normal}
 </style>
 <script src="./config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head><body><div class="app"><header><div class="brand">ХОЧУ<b>.</b></div><div class="row"><span class="tag">ХОЧУ · v24.2.0</span><button onclick="openNotifications()" aria-label="Уведомления" class="btn ghost" style="padding:8px 10px">🔔 <span id="unreadBadge" style="display:none">0</span></button><button onclick="refreshAll()" aria-label="Обновить" class="btn gray" style="padding:8px 10px">↻</button></div></header>
+<link rel="stylesheet" href="./offer-details.css">
+</head><body><div class="app"><header><div class="brand">ХОЧУ<b>.</b></div><div class="row"><span class="tag">ХОЧУ · v24.3.0</span><button onclick="openNotifications()" aria-label="Уведомления" class="btn ghost" style="padding:8px 10px">🔔 <span id="unreadBadge" style="display:none">0</span></button><button onclick="refreshAll()" aria-label="Обновить" class="btn gray" style="padding:8px 10px">↻</button></div></header>
 <section id="home" class="page active"><div class="hero"><h1>Ты хочешь.<br>Тебе предлагают.</h1><p>Расскажи, что нужно. Продавцы сами найдут тебя и предложат цену.</p><div class="row"><span><strong id="countRequests">…</strong><br><span class="small">активных желаний</span></span><span style="margin-left:24px"><strong id="categoryCount"></strong><br><span class="small">категорий</span></span></div></div>
 <div class="home-actions"><button class="btn action-main" onclick="openRequest()">＋ Разместить желание</button><button class="btn action-seller" onclick="openSellerMatches()">🎯 Я продавец</button><button class="btn action-crowd" onclick="openCrowdV200()">👥 Купить толпой</button></div>
 <div class="social-heading"><h2>Что ищем сегодня?</h2><button class="mini-link" onclick="navigate('catalog');openCatalogFiltersV2321()">Все категории →</button></div><div id="homeCats" class="grid home-cats"></div>
@@ -146,7 +147,7 @@ h2{font-size:21px;letter-spacing:-.5px}.hero{border-radius:25px;padding:21px 20p
 <div class="mobile-filter-label">Сортировка</div><div id="catalogSortChoicesV2321" class="mobile-sort-options" role="group" aria-label="Сортировка"></div>
 </div><div class="mobile-filter-footer"><button type="button" class="btn ghost" onclick="resetCatalogFiltersV2321()">Сбросить</button><button type="button" class="btn" onclick="applyCatalogFiltersV2321()">Показать желания</button></div>
 </section></div><div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()"><div class="modal" id="modal"></div></div><div id="toast" class="toast"></div>
-<script src="./categories.js"></script><script src="./cities-data.js"></script><script src="./brands-data.js"></script><script src="./product-catalog.js"></script><script src="./car-brands.js"></script><script src="./car-brand-ui.js"></script><script src="./product-brands.js"></script><script src="./product-brand-ui.js"></script><script src="./car-model-data.js"></script><script src="./phone-model-data.js"></script><script src="./model-picker.js"></script><script src="./search-directory.js"></script><script src="./request-tools.js"></script><script src="./request-editor.js"></script><script src="./saved-searches.js"></script>
+<script src="./categories.js"></script><script src="./cities-data.js"></script><script src="./brands-data.js"></script><script src="./product-catalog.js"></script><script src="./car-brands.js"></script><script src="./car-brand-ui.js"></script><script src="./product-brands.js"></script><script src="./product-brand-ui.js"></script><script src="./car-model-data.js"></script><script src="./phone-model-data.js"></script><script src="./model-picker.js"></script><script src="./search-directory.js"></script><script src="./request-tools.js"></script><script src="./request-editor.js"></script><script src="./saved-searches.js"></script><script src="./offer-details.js"></script>
 <script>
 'use strict';
 
@@ -330,10 +331,8 @@ function renderCatalog(){
  if(summary)summary.textContent=`${f.category||'Все категории'}${f.brand?' · '+f.brand:''}${f.model?' · '+f.model:''} · ${f.sort==='new'?'Новые':f.sort==='cheap'?'Дешёвые':'Дорогие'} · ${a.length} заявок`;
 }
 function renderActivity(){['Requests','Offers','Favorites'].forEach(k=>$('tab'+k).classList.toggle('active',activityMode===k.toLowerCase()));if(!user){$('activityContent').innerHTML='<div class="empty">Войди в аккаунт, чтобы видеть свои заявки и отклики.</div><button class="btn block" onclick="openAuth()">Войти</button>';return}let html;if(activityMode==='requests'){const a=requests.filter(x=>x.buyer_id===user.id);html=a.length?a.map(requestCard).join(''):'<div class="empty">У тебя пока нет заявок</div>'}else if(activityMode==='offers'){html=offers.filter(x=>x.seller_id===user.id).map(o=>offerCard(o)).join('')||'<div class="empty">Ещё нет отправленных предложений</div>'}else{html=requests.filter(x=>favorites.has(x.id)).map(requestCard).join('')||'<div class="empty">Избранное пустое</div>'}$('activityContent').innerHTML=html;queueRequestPhotos()}
-function offerCard(o){
- const r=requests.find(x=>x.id===o.request_id),count=offerImages.filter(x=>x.offer_id===o.id).length,deal=deals.find(d=>d.request_id===o.request_id),mine=r?.buyer_id===user?.id;
- return `<div class="card"><div class="small muted">${esc(r?.title||'Заявка')}</div><div class="small muted"><span class="small muted">Рейтинг — в публичном профиле</span> <button class="mini-link" onclick="showSeller('${o.seller_id}')">Профиль продавца →</button></div>${deal?.offer_id===o.id?'<span class="chip green">✓ Выбранное предложение</span>':''}<h3>${money(o.price)}</h3><p>${esc(o.description)}</p>${count?`<div class="photo-grid" id="gallery-${o.id}">📷 ${count} фото · загрузка…</div>`:''}<div class="row" style="flex-wrap:wrap"><button class="btn ghost" onclick="openChat('${o.id}')">💬 Переписка</button>${mine&&r?.status==='open'&&!deal?`<button class="btn" onclick="selectOffer('${o.id}')">✓ Выбрать продавца</button>`:''}${deal?.offer_id===o.id?`<button class="btn ghost" onclick="showDeal('${deal.id}')">🤝 Сделка</button>`:''}</div></div>`
-}
+function offerCard(o){return detailedOfferCard(o)}
+
 function renderProfile(){
  const el=$('profileContent');
  if(!configured){el.innerHTML='<div class="notice">Supabase не подключён. Проверь config.js.</div>';return}
@@ -384,27 +383,18 @@ async function toggleStatus(id,status){
  finally{endAction('request:status:'+id)}
 }
 function toggleFavorite(id){favorites.has(id)?favorites.delete(id):favorites.add(id);localStorage.setItem('hochu_favorites_'+(user?.id||'guest'),JSON.stringify([...favorites]));showRequest(id)}
-async function loadRequestOffers(id){
- const target=$('requestOffers');if(!target)return;
- if(!user){target.innerHTML='<p class="muted">Войди, чтобы увидеть предложения, адресованные тебе.</p>';return}
- const a=offers.filter(o=>o.request_id===id);
- if(comparisonRequestId!==id){comparisonRequestId=id;comparisonOfferIds=new Set()}
- const mine=requests.find(r=>r.id===id)?.buyer_id===user.id;
- comparisonOfferIds=new Set([...comparisonOfferIds].filter(key=>a.some(o=>o.id===key)));
- const compare=mine&&a.length>1;
- target.innerHTML=a.length?(compare?`<p class="small muted">Отметьте 2–3 предложения, чтобы сравнить цену, условия и фотографии.</p><button id="compareOffersButton" class="btn block" style="margin-bottom:12px" onclick="openOfferComparison()" ${comparisonOfferIds.size<2?'disabled':''}>Сравнить (${comparisonOfferIds.size}/3)</button>`:'')+a.map(o=>(compare?`<label class="row small" style="padding:8px 0"><input type="checkbox" value="${esc(o.id)}" ${comparisonOfferIds.has(o.id)?'checked':''} onchange="toggleOfferComparison(this)"> В сравнение · ${money(o.price)}</label>`:'')+offerCard(o)).join(''):'<div class="empty">Предложений пока нет</div>';
- for(const o of a)await loadOfferGallery(o.id);
-}
+async function loadRequestOffers(id){return loadDetailedRequestOffers(id)}
+
 function openOffer(id){
  if(!requireAuth())return;const previous=myOfferForRequest(id);if(previous){toast('Вы уже отправили предложение. Открываем переписку.');openChat(previous.id);return;}const r=requests.find(x=>x.id===id);if(!r||r.buyer_id===user.id||r.status!=='open'||r.is_hidden)return toast('Эта заявка недоступна для предложений');
- modal({title:'Предложить вариант',body:`<p class="muted">${esc(r.title)} · бюджет ${money(r.budget)}</p><form onsubmit="sendOffer(event,'${id}')"><div class="fieldset"><label class="fieldlabel">Ваша цена, ₽</label><input class="field" type="number" name="price" min="1" max="1000000000" required></div>${brandFieldMarkup(r.category)}${genericModelMarkup(r.category)}<div class="fieldset"><label class="fieldlabel">Что предлагаете?</label><textarea class="field" name="description" minlength="4" maxlength="2000" required placeholder="Состояние, характеристики, сроки…"></textarea></div><div class="fieldset"><label class="fieldlabel">Фото (до 5, каждое до 5 МБ)</label><input class="field" type="file" name="photos" accept="image/jpeg,image/png,image/webp" multiple onchange="previewPhotoCount(this)"><span id="photoPreview">Можно оставить без фотографий</span></div><button type="submit" class="btn block">Отправить предложение</button></form>`})
+ modal({title:'Предложить вариант',body:`<p class="muted">${esc(r.title)} · бюджет ${money(r.budget)}</p><form onsubmit="sendOffer(event,'${id}')"><div class="fieldset"><label class="fieldlabel">Ваша цена, ₽</label><input class="field" type="number" name="price" min="1" max="1000000000" required></div>${brandFieldMarkup(r.category)}${offerSpecificationMarkup(r.category)}${offerTermsMarkup(r.category)}<div class="fieldset"><label class="fieldlabel">Что предлагаете?</label><textarea class="field" name="description" minlength="4" maxlength="2000" required placeholder="Состояние, характеристики, сроки…"></textarea></div><div class="fieldset"><label class="fieldlabel">Фото (до 5, каждое до 5 МБ)</label><input class="field" type="file" name="photos" accept="image/jpeg,image/png,image/webp" multiple onchange="previewPhotoCount(this)"><span id="photoPreview">Можно оставить без фотографий</span></div><button type="submit" class="btn block">Отправить предложение</button></form>`})
 }
 async function sendOffer(e,id){
  e.preventDefault();if(!user||!startAction('offer:'+id))return;const form=e.target,f=new FormData(form),files=Array.from(form.querySelector('[name=photos]').files||[]),btn=form.querySelector('[type=submit]');
  try{
   if(myOfferForRequest(id))throw Error('Предложение уже отправлено. Откройте чат вместо повторной отправки.');
   if(files.length>5)throw Error('Можно прикрепить не больше 5 фотографий');files.forEach(file=>validateImage(file,5));btn.disabled=true;
-  const {data:offer,error}=await db.from('offers').insert({request_id:id,seller_id:user.id,price:Number(f.get('price')),description:descriptionWithBrand(f,requests.find(r=>r.id===id)?.category)}).select('id').single();if(error)throw error;
+  const {data:offer,error}=await db.from('offers').insert({request_id:id,seller_id:user.id,price:Number(f.get('price')),description:offerDescription(f,requests.find(r=>r.id===id)?.category)}).select('id').single();if(error)throw error;
   let failures=0;
   for(const file of files){const path=`${user.id}/${offer.id}/${crypto.randomUUID()}.${imageExt(file)}`;
    const up=await db.storage.from('hochu-offer-images').upload(path,file,{contentType:file.type,upsert:false});if(up.error){failures++;continue}
