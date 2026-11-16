@@ -1,5 +1,6 @@
 const auctionNoticeEvents=new Set(['auction_ended_buyer','auction_ended_seller','auction_choice_reminder']);
 function notificationActionMarkup(notice){
+ if(['question_asked','question_answered'].includes(notice.qa_event))return `<button class="btn ghost" onclick="openQuestionNotification('${notice.id}')">Открыть вопросы</button>`;
  if(notice.request_event==='request_expired')return `<button class="btn ghost" onclick="openExpiredRequestNotification('${notice.id}')">Проверить актуальность</button>`;
  if(auctionNoticeEvents.has(notice.auction_event))return `<button class="btn ghost" onclick="openAuctionNotification('${notice.id}')">${notice.auction_event==='auction_ended_seller'?'Открыть моё предложение':'Открыть предложения'}</button>`;
  return notice.offer_id?`<button class="btn ghost" onclick="goFromNotification('${notice.offer_id}','${notice.id}')">Открыть переписку</button>`:notice.request_id?`<button class="btn ghost" onclick="goToMatchedRequest('${notice.request_id}','${notice.id}')">Открыть заявку</button>`:'';

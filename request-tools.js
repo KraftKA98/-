@@ -17,6 +17,7 @@ function requestFieldDefinitions(category){
     ['delivery','Получение','select',['Самовывоз','Доставка','Любой вариант']]];
   if(['Электроника','Компьютеры','Авто','Бытовая техника','Инструменты','Сад','Бизнес и оборудование'].includes(group))fields.unshift(['model','Модель','text']);
   if(group==='Электроника'||group==='Компьютеры')fields.push(['specs','Память и важные характеристики','text']);
+  if(['Одежда','Детские товары'].includes(group))fields.push(['size','Размер','text']);
   if(group==='Авто')fields.push(['year','Год выпуска от','number'],['mileage','Пробег до, км','number']);
   if(isCarModelCategory(category))return [['model','Модель','text'],['generation','Поколение','text'],['year','Год выпуска от','number'],['mileage','Пробег до, км','number'],['gearbox','Коробка передач','select',['Механическая','Автоматическая','Робот','Вариатор','Не имеет значения']],...fields.filter(field=>!['model','year','mileage'].includes(field[0]))];
   if(isPhoneModelCategory(category)){fields.splice(1,0,['storage','Встроенная память','text']);for(const field of fields)if(field[0]==='specs')field[1]='Другие характеристики'}
