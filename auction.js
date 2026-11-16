@@ -9,7 +9,7 @@ function auctionStore(state,owner=user?.id){
  if(!state||!['none','active','ended','closed','selected'].includes(state.status)||!state.request_id)throw Error('Не удалось проверить состояние торгов');
  const key=owner+':'+state.request_id,previous=auctionStates.get(key);
  if(previous&&Date.parse(previous.server_now)>Date.parse(state.server_now))return previous;
- const value={...state,clockOffset:Date.parse(state.server_now)-Date.now()};auctionStates.set(key,value);return value;
+ const value={...state,clockOffset:Date.parse(state.server_now)-Date.now()};auctionStates.set(key,value);if(typeof rememberAuctionSummary==='function')rememberAuctionSummary(value);return value;
 }
 async function auctionRead(id){
  if(!user)throw Error('Войдите для участия в торгах');const owner=user.id,key=auctionKey(id);
