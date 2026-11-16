@@ -30,9 +30,41 @@ function categoryGroup(value){return categoryTree.find(([,name,children]) => nam
 function categoryMatches(value,filter){return !filter||value===filter||!!categoryTree.find(([,name,children])=>name===filter&&children.includes(value))}
 function isKnownCategory(value){return !!categoryGroup(value)}
 function categoryIcon(value){return categoryGroup(value)?.[0]||'✨'}
+function categoryEscape(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function categoryOption(value,label,selected){return `<option value="${categoryEscape(value)}"${value===selected?' selected':''}>${categoryEscape(label)}</option>`}
 function categoryOptions(selected='',all=false){
-  const safe=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const option=(value,label)=>`<option value="${safe(value)}"${value===selected?' selected':''}>${safe(label)}</option>`;
-  return (all?option('','Все категории'):'')+categoryTree.map(([icon,name,children])=>
-    `<optgroup label="${safe(icon+' '+name)}">${option(name,all?'Весь раздел «'+name+'»':name+' — без уточнения')}${children.map(child=>option(child,child)).join('')}</optgroup>`).join('');
+  const parent=categoryGroup(selected)?.[1]||'';
+  return categoryOption('',all?'Все категории':'Выберите категорию',parent)+categoryTree.map(([icon,name])=>categoryOption(name,icon+' '+name,parent)).join('');
+}
+function subcategoryOptions(parent,selected='',all=false){
+  const group=categoryTree.find(([,name])=>name===parent);
+  if(!group)return '';
+  return categoryOption(parent,all?'Весь раздел':'Без уточнения',selected)+group[2].map(child=>categoryOption(child,child,selected)).join('');
+}
+function categoryPicker(selected='',all=false,onchange=''){
+  const group=categoryGroup(selected),parent=group?.[1]||'';
+  const show=!!group?.[2].length;
+  return `<div class="category-picker" style="width:100%" data-all="${all}" data-onchange="${categoryEscape(onchange)}">
+    <input type="hidden" class="category-value" name="category" value="${categoryEscape(selected)}">
+    <select class="field" name="categoryParent" aria-label="Основная категория" ${all?'':'required'} onchange="changeCategoryPicker(this,true)">${categoryOptions(selected,all)}</select>
+    <label class="category-child" ${show?'':'hidden'} style="margin-top:12px"><span class="fieldlabel">Подкатегория</span>
+      <select class="field" name="categoryChild" aria-label="Подкатегория" ${show?'':'disabled'} onchange="changeCategoryPicker(this,false)">${subcategoryOptions(parent,selected,all)}</select>
+    </label>
+  </div>`;
+}
+function changeCategoryPicker(select,parentChanged){
+  const picker=select.closest('.category-picker'),all=picker.dataset.all==='true';
+  const parent=picker.querySelector('[name="categoryParent"]').value;
+  const child=picker.querySelector('[name="categoryChild"]');
+  if(parentChanged){
+    const group=categoryTree.find(([,name])=>name===parent),show=!!group?.[2].length;
+    child.innerHTML=subcategoryOptions(parent,parent,all);
+    child.disabled=!show;
+    picker.querySelector('.category-child').hidden=!show;
+  }
+  const value=parentChanged?parent:child.value;
+  picker.querySelector('.category-value').value=value;
+  const callback=picker.dataset.onchange;
+  if(callback==='setHomeCategoryV232')setHomeCategoryV232(value);
+  if(callback==='chooseCatalogCategoryV2321')chooseCatalogCategoryV2321(value);
 }
