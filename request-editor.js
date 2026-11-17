@@ -97,7 +97,7 @@ function openRequestEditor(id=null,prefill={}){
     const option=new Option(original.category,original.category,true,true);form.elements.categoryParent.add(option);form.elements.category.value=original.category;
   }
   for(const [key,value] of Object.entries(values.details||{})){const field=form.elements['detail_'+key];if(field)field.value=value}
-  refreshRequestBudget(form);renderRequestPhotoDraft();
+  refreshRequestBudget(form);renderRequestPhotoDraft();if(typeof socialBindDraft==='function')socialBindDraft(form);
 }
 function validateRequestRecord(record,original){
   if(!isKnownCategory(record.category)&&record.category!==original?.category)throw Error('Выберите категорию');
@@ -136,7 +136,7 @@ async function submitRequestEditor(event){
     }
     const removed=requestPhotoPaths(state.original).filter(path=>!state.keep.includes(path));
     await removeUnreferencedRequestPhotos(removed);
-    state.busy=false;closeModal();
+    state.busy=false;if(typeof socialDraftPublished==='function')socialDraftPublished(state.id);closeModal();
     requests=requests.filter(request=>request.id!==saved.id);requests.unshift(saved);renderAll();
     await refreshAll();
     if(!requests.some(request=>request.id===saved.id))requests.unshift(saved);
