@@ -1,5 +1,5 @@
 /* Increment VERSION whenever the application files change. Private/API data is never cached. */
-const VERSION = 'hochu-pwa-20261117-guidance-v32';
+const VERSION = 'hochu-pwa-20261117-profile-v33-0-1';
 const ASSETS = ['./offline.html', './icon/icon-192.png', './icon/icon-512.png', './icon/icon-180.png', './icon/maskable-512.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(VERSION).then(cache => cache.addAll(ASSETS)));
