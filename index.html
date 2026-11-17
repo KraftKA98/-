@@ -127,7 +127,7 @@ h2{font-size:21px;letter-spacing:-.5px}.hero{border-radius:25px;padding:21px 20p
 </style>
 <script src="./config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="./offer-details.css"><link rel="stylesheet" href="./auction.css"><link rel="stylesheet" href="./auction-discovery.css"><link rel="stylesheet" href="./saved-sellers.css"><link rel="stylesheet" href="./request-lifetime.css"><link rel="stylesheet" href="./request-questions.css"><link rel="stylesheet" href="./marketplace-v25.css"><link rel="stylesheet" href="./growth-v26.css"><link rel="stylesheet" href="./social-business.css"><link rel="stylesheet" href="./kindness.css">
-</head><body><div class="app"><header><div class="brand">ХОЧУ<b>.</b></div><div class="row"><span class="tag">ХОЧУ · v28.0.0</span><button onclick="openNotifications()" aria-label="Уведомления" class="btn ghost" style="padding:8px 10px">🔔 <span id="unreadBadge" style="display:none">0</span></button><button onclick="refreshAll()" aria-label="Обновить" class="btn gray" style="padding:8px 10px">↻</button></div></header>
+</head><body><div class="app"><header><div class="brand">ХОЧУ<b>.</b></div><div class="row"><span class="tag">ХОЧУ · v29.0.0</span><button onclick="openNotifications()" aria-label="Уведомления" class="btn ghost" style="padding:8px 10px">🔔 <span id="unreadBadge" style="display:none">0</span></button><button onclick="refreshAll()" aria-label="Обновить" class="btn gray" style="padding:8px 10px">↻</button></div></header>
 <section id="home" class="page active"><div class="hero"><h1>Ты хочешь.<br>Тебе предлагают.</h1><p>Расскажи, что нужно. Продавцы сами найдут тебя и предложат цену.</p><div class="row"><span><strong id="countRequests">…</strong><br><span class="small">активных желаний</span></span><span style="margin-left:24px"><strong id="categoryCount"></strong><br><span class="small">категорий</span></span></div></div>
 <div class="home-actions"><button class="btn action-main" onclick="openRequest()">＋ Разместить желание</button><button class="btn action-seller" onclick="openSellerMatches()">🎯 Я продавец</button><button class="btn action-crowd" onclick="openCrowdV200()">👥 Купить толпой</button></div>
 <div class="social-heading"><h2>Что ищем сегодня?</h2><button class="mini-link" onclick="navigate('catalog');openCatalogFiltersV2321()">Все категории →</button></div><div id="homeCats" class="grid home-cats"></div>
@@ -147,7 +147,7 @@ h2{font-size:21px;letter-spacing:-.5px}.hero{border-radius:25px;padding:21px 20p
 <div class="mobile-filter-label">Сортировка</div><div id="catalogSortChoicesV2321" class="mobile-sort-options" role="group" aria-label="Сортировка"></div>
 </div><div class="mobile-filter-footer"><button type="button" class="btn ghost" onclick="resetCatalogFiltersV2321()">Сбросить</button><button type="button" class="btn" onclick="applyCatalogFiltersV2321()">Показать желания</button></div>
 </section></div><div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()"><div class="modal" id="modal"></div></div><div id="toast" class="toast"></div>
-<script src="./categories.js"></script><script src="./cities-data.js"></script><script src="./brands-data.js"></script><script src="./product-catalog.js"></script><script src="./car-brands.js"></script><script src="./car-brand-ui.js"></script><script src="./product-brands.js"></script><script src="./product-brand-ui.js"></script><script src="./car-model-data.js"></script><script src="./phone-model-data.js"></script><script src="./model-picker.js"></script><script src="./search-directory.js"></script><script src="./request-tools.js"></script><script src="./request-editor.js"></script><script src="./saved-searches.js"></script><script src="./offer-details.js"></script><script src="./auction.js"></script><script src="./auction-discovery.js"></script><script src="./auction-notifications.js"></script><script src="./saved-sellers.js"></script><script src="./request-lifetime.js"></script><script src="./request-questions.js"></script><script src="./workspace-core.js"></script><script src="./deal-flow.js"></script><script src="./trust-tools.js"></script><script src="./discovery-tools.js"></script><script src="./seller-tools.js"></script><script src="./growth-core.js"></script><script src="./archives-protection.js"></script><script src="./negotiation-referrals.js"></script><script src="./merchant-network.js"></script><script src="./demand-map.js"></script><script src="./social-tools.js"></script><script src="./personal-tools.js"></script><script src="./catalog-import.js"></script><script src="./business-tools.js"></script><script src="./kindness-tools.js"></script><script src="./ui-icons.js"></script>
+<script src="./categories.js"></script><script src="./cities-data.js"></script><script src="./brands-data.js"></script><script src="./product-catalog.js"></script><script src="./car-brands.js"></script><script src="./car-brand-ui.js"></script><script src="./product-brands.js"></script><script src="./product-brand-ui.js"></script><script src="./car-model-data.js"></script><script src="./phone-model-data.js"></script><script src="./model-picker.js"></script><script src="./search-directory.js"></script><script src="./request-tools.js"></script><script src="./request-editor.js"></script><script src="./saved-searches.js"></script><script src="./offer-details.js"></script><script src="./auction.js"></script><script src="./auction-discovery.js"></script><script src="./auction-notifications.js"></script><script src="./saved-sellers.js"></script><script src="./request-lifetime.js"></script><script src="./request-questions.js"></script><script src="./workspace-core.js"></script><script src="./deal-flow.js"></script><script src="./trust-tools.js"></script><script src="./discovery-tools.js"></script><script src="./seller-tools.js"></script><script src="./growth-core.js"></script><script src="./archives-protection.js"></script><script src="./negotiation-referrals.js"></script><script src="./merchant-network.js"></script><script src="./demand-map.js"></script><script src="./social-tools.js"></script><script src="./personal-tools.js"></script><script src="./catalog-import.js"></script><script src="./business-tools.js"></script><script src="./kindness-tools.js"></script><script src="./ui-icons.js"></script><script src="./stability-v29.js"></script>
 <script>
 'use strict';
 
@@ -190,41 +190,36 @@ function closeModal(){socialFlushDraft();if(!clearRequestEditor())return toast('
 function navigate(p){closeHomeFiltersV232();if(!$('catalogFilterOverlayV2321')?.hidden)closeCatalogFiltersV2321();if(p!=='crowd')crowdStopRealtimeV204();if(p==='owner'&&!isOwner)return toast('Доступ только владельцу');if(p==='admin'&&!isAdmin)return toast('Доступ только модератору');mode=p;document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===p));document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('active',x.dataset.page===p));if(p==='social')loadSocialFeed();if(p==='kindness')loadKindness();if(p==='crowd')loadCrowdV200();if(p==='inbox')loadInboxV237();if(p==='profile')renderProfile();if(p==='activity')renderActivity();if(p==='catalog')renderCatalog();if(p==='my-auctions')loadMyAuctions();if(p==='saved-sellers')loadSavedSellers();if(p==='admin')loadAdminPanel();if(p==='owner')loadOwnerPanel();window.scrollTo(0,0)}
 function setCategory(c){navigate('catalog');catalogFilterV2321.category=c;catalogFilterV2321.brand='';catalogFilterV2321.model='';renderCatalog()}
 function requireAuth(){if(!configured){toast('Нужно подключить Supabase — см. config.js');return false}if(!user){openAuth();return false}return true}
-function openAuth(){modal({title:'Войти в ХОЧУ.',body:`<div class="notice">Это настоящая регистрация: укажи email и пароль. Если в Supabase включено подтверждение почты, проверь письмо.</div><form onsubmit="authSubmit(event)"><div class="fieldset"><label class="fieldlabel">Email</label><input class="field" name="email" type="email" required autocomplete="email"></div><div class="fieldset"><label class="fieldlabel">Пароль (от 6 символов)</label><input class="field" name="password" type="password" minlength="6" required autocomplete="current-password"></div><div class="row"><button class="btn" type="submit" name="action" value="login">Войти</button><button class="btn ghost" type="submit" name="action" value="signup">Регистрация</button></div></form>`})}
+function openAuth(){modal({title:'Войти в ХОЧУ.',body:`<div class="notice">Это настоящая регистрация: укажи email и пароль. Если в Supabase включено подтверждение почты, проверь письмо.</div><form onsubmit="authSubmit(event)"><div class="fieldset"><label class="fieldlabel">Email</label><input class="field" name="email" type="email" required autocomplete="email"></div><div class="fieldset"><label class="fieldlabel">Пароль (от 6 символов)</label><input class="field" name="password" type="password" minlength="6" required autocomplete="current-password"></div><div class="row"><button class="btn" type="submit" name="action" value="login">Войти</button><button class="btn ghost" type="submit" name="action" value="signup">Регистрация</button></div></form><button class="btn ghost block" onclick="openPasswordRecoveryV29()">🔑 Забыли пароль?</button>`})}
 async function authSubmit(e){e.preventDefault();if(!db)return;const f=new FormData(e.target),email=String(f.get('email')||'').trim(),password=String(f.get('password')||'');const action=e.submitter?.value||'login';if(!email||password.length<6)return toast('Проверь email и пароль');const b=e.submitter;b.disabled=true;try{const {data,error}=action==='signup'?await db.auth.signUp({email,password}):await db.auth.signInWithPassword({email,password});if(error)throw error;if(action==='signup'&&!data.session){toast('Проверь почту и подтверди регистрацию');closeModal();return}closeModal();toast('Вы вошли в ХОЧУ.');await refreshAll()}catch(err){toast(err.message||'Ошибка входа')}finally{b.disabled=false}}
-async function ensureProfile(){if(!user)return;let {data,error}=await db.from('profiles').select('*').eq('id',user.id).maybeSingle();if(error)throw error;if(!data){const {error:ie}=await db.from('profiles').insert({id:user.id,display_name:user.email?.split('@')[0]||'Пользователь'});if(ie&&ie.code!=='23505')throw ie;const res=await db.from('profiles').select('*').eq('id',user.id).single();if(res.error)throw res.error;data=res.data}profile=data}
+async function ensureProfile(){if(!user)return;const actor=user,stamp=accountStampV29();let {data,error}=await db.from('profiles').select('*').eq('id',actor.id).maybeSingle();if(!accountCurrentV29(stamp))return;if(error)throw error;if(!data){const {error:ie}=await db.from('profiles').insert({id:actor.id,display_name:actor.email?.split('@')[0]||'Пользователь'});if(!accountCurrentV29(stamp))return;if(ie&&ie.code!=='23505')throw ie;const res=await db.from('profiles').select('*').eq('id',actor.id).single();if(!accountCurrentV29(stamp))return;if(res.error)throw res.error;data=res.data}profile=data}
 async function refreshAll(){
- if(!configured){$('homeRequests').innerHTML='<div class="notice">⚙️ Подключи Supabase в config.js.</div>';renderProfile();return}
- if(!db){toast('Библиотека Supabase не загрузилась');return}
+ if(!configured){$('homeRequests').innerHTML='<div class="notice">Подключение недоступно. Попробуйте позже.</div>';renderProfile();return}
+ if(!db){toast('Библиотека подключения не загрузилась');return}
+ const authStamp=accountStampV29(),start=++refreshSequenceV29;let valid=()=>start===refreshSequenceV29&&accountCurrentV29(authStamp);
  loadRequestLifetimeClock();
  try{
-  // v23.5.1: отсутствие сессии — штатный гостевой режим, а не ошибка публичной страницы.
-   const {data:authData,error:ae}=await db.auth.getUser();
-   const missingSession=ae&&(ae.name==='AuthSessionMissingError'||/auth session missing|session missing/i.test(ae.message||''));
-   if(ae&&!missingSession)throw ae;
-   user=missingSession?null:(authData?.user||null);if(user){await ensureProfile();const check=await db.rpc('hochu_is_admin');isAdmin=!check.error && check.data===true;const own=await db.rpc('hochu_is_owner_v11');isOwner=!own.error&&own.data===true;}else{profile=null;isAdmin=false;isOwner=false;}
-  const res=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at').order('created_at',{ascending:false}).limit(200);
-  if(res.error)throw res.error;requests=res.data||[];offers=[];offerImages=[];
-  // Обновляем публичные разделы сразу после загрузки заявок.
-  // Ошибки дополнительных модулей не должны оставлять на главной ложный ноль.
-   renderAll();
+  const {data:authData,error:ae}=await db.auth.getUser();if(!valid())return;
+  const missingSession=ae&&(ae.name==='AuthSessionMissingError'||/auth session missing|session missing/i.test(ae.message||''));if(ae&&!missingSession)throw ae;
+  setAccountV29(missingSession?null:(authData?.user||null));
+  const sequence=++refreshSequenceV29,stamp=accountStampV29();valid=()=>sequence===refreshSequenceV29&&accountCurrentV29(stamp);
+  if(user){await ensureProfile();if(!valid())return;const check=await db.rpc('hochu_is_admin');if(!valid())return;isAdmin=!check.error&&check.data===true;const own=await db.rpc('hochu_is_owner_v11');if(!valid())return;isOwner=!own.error&&own.data===true}
+  const rows=await loadReadableRequestsV29(valid);if(!valid()||!rows)return;requests=rows;offers=[];offerImages=[];renderAll();
   if(user){
-   const r=await db.from('offers').select('id,request_id,seller_id,price,description,created_at').order('created_at',{ascending:false});if(r.error)throw r.error;offers=r.data||[];
-   const photos=await db.from('offer_images').select('id,offer_id,path,created_at').order('created_at');if(photos.error)throw photos.error;offerImages=photos.data||[];
-   const d=await db.from('deals').select('id,request_id,offer_id,buyer_id,seller_id,status,selected_at,completed_at');if(d.error)throw d.error;deals=d.data||[];
-   const rev=await db.from('seller_reviews').select('id,deal_id,buyer_id,seller_id,rating,comment,created_at').order('created_at',{ascending:false}).limit(500);if(rev.error)throw rev.error;reviews=rev.data||[];
-   await loadNotifications();
-   await loadSellerSubscriptions();
-   await loadMatchingRequests();
+   const r=await db.from('offers').select('id,request_id,seller_id,price,description,created_at').order('created_at',{ascending:false});if(!valid())return;if(r.error)throw r.error;offers=r.data||[];
+   const photos=await db.from('offer_images').select('id,offer_id,path,created_at').order('created_at');if(!valid())return;if(photos.error)throw photos.error;offerImages=photos.data||[];
+   const d=await db.from('deals').select('id,request_id,offer_id,buyer_id,seller_id,status,selected_at,completed_at');if(!valid())return;if(d.error)throw d.error;deals=d.data||[];
+   const rev=await db.from('seller_reviews').select('id,deal_id,buyer_id,seller_id,rating,comment,created_at').order('created_at',{ascending:false}).limit(500);if(!valid())return;if(rev.error)throw rev.error;reviews=rev.data||[];
+   await loadNotifications();if(!valid())return;await loadSellerSubscriptions();if(!valid())return;await loadMatchingRequests();if(!valid())return;
   }else{notifications=[];deals=[];reviews=[];subscriptions=[];matchingRequests=[];updateBadge()}
   renderAll();renderMatches();if(mode==='my-auctions')loadMyAuctions();if(mode==='saved-sellers')loadSavedSellers();
- }catch(err){console.error(err);toast('Ошибка загрузки: '+err.message);renderAll();renderProfile();
-    const host=$('homeRequests');if(host&&requests.length===0)host.innerHTML='<div class="notice">Не удалось получить заявки. Проверь подключение Supabase и права доступа, затем нажми ↻.</div>';
-  }
+ }catch(err){if(!valid())return;console.error(err);toast('Ошибка загрузки: '+workspaceError(err));renderAll();renderProfile();const host=$('homeRequests');if(host&&requests.length===0)host.innerHTML='<div class="notice">Не удалось получить полную выдачу. Обновите страницу или попробуйте позже.</div>'}
 }
+
 function publicRequests(){return requests.filter(r=>r.status==='open'&&!r.is_hidden&&requestIsCurrent(r)&&workspaceRequestVisible(r))}
 function visibleCatalogRequests(){return requests.filter(r=>((r.status==='open'&&!r.is_hidden&&requestIsCurrent(r))||(user&&r.buyer_id===user.id))&&workspaceRequestVisible(r))}
-let homeCategorySelectedV232='',homeSortSelectedV232='new';
+let homeCategorySelectedV232='',homeSortSelectedV232='new',homeFeedLimitV29=20,homeFeedKeyV29='';
+function homeFeedMoreV29(){homeFeedLimitV29+=20;renderHomeFeed()}
 function renderHomeFilterChoicesV232(){
  const holder=$('homeCategoryButtonsV232');if(!holder)return;
  holder.innerHTML=categoryPicker(homeCategorySelectedV232,true,'setHomeCategoryV232');refreshBrandFilter('home');
@@ -262,8 +257,9 @@ function renderHomeFeed(){
  if(sort==='cheap')current.sort((a,b)=>Number(a.budget)-Number(b.budget));
  else if(sort==='expensive')current.sort((a,b)=>Number(b.budget)-Number(a.budget));
  else current.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
- const counter=$('homeFeedCountV231');if(counter)counter.textContent=`Найдено желаний: ${current.length}${current.length>20?' · показаны первые 20':''}`;
- host.innerHTML=current.length?current.slice(0,20).map(requestCard).join(''):auctionFeedEmptyMarkup('home');queueRequestPhotos();scheduleAuctionFeedLoad();
+ const feedKey=JSON.stringify([q,city,category,min,max,sort,homeBrandFilter,homeModelFilter,auctionFeedFilters.home]);if(feedKey!==homeFeedKeyV29){homeFeedKeyV29=feedKey;homeFeedLimitV29=20}
+ const counter=$('homeFeedCountV231');if(counter)counter.textContent=`Найдено желаний: ${current.length}${current.length>homeFeedLimitV29?' · показано '+homeFeedLimitV29:''}`;
+ host.innerHTML=current.length?current.slice(0,homeFeedLimitV29).map(requestCard).join('')+(current.length>homeFeedLimitV29?'<button class="btn ghost block" onclick="homeFeedMoreV29()">Показать ещё желания</button>':''):auctionFeedEmptyMarkup('home');queueRequestPhotos();scheduleAuctionFeedLoad();
 }
 function renderAll(){syncWorkspaceIdentity();syncSocialIdentity();syncKindnessIdentity();syncQuestionIdentity();syncMyAuctionIdentity();syncSavedSellerIdentity();const current=publicRequests();$('countRequests').textContent=current.length;renderHomeFeed();renderCatalog();renderActivity();renderProfile();renderInbox()}
 function requestCard(r){
@@ -352,7 +348,7 @@ function renderProfile(){
  <div class="card profile-v233-section"><h3>🎯 Инструменты продавца</h3>${btn('Подходящие заявки и подписки','openSellerMatches()')}${btn('Моя подборка по городам, брендам и категориям','openDiscovery()')}${btn('Статистика предложений и сделок','openSellerStatistics()')}${btn('Шаблоны ответов','openReplyTemplates()')}${btn('Магазины · ХОЧУ API','openShopsHub()')}${btn('ХОЧУ Network','openNetworkHub()')}${btn('Карта, индекс спроса и прогноз','openDemandMap()')}${btn('Скидки и автоторг','openPrivateQuotes()')}${btn('Рекомендации за результат','openReferralHub()')}${btn('🔻 Мои торги','openMyAuctions()')}${btn('⭐ Тарифы Free / PRO','openProPlansV19()')}${btn('📈 PRO · Аналитика спроса','openProDemandAnalyticsV191()')}${btn('🔔 PRO · Умные оповещения','openProSmartAlertsV192()')}${btn('📜 История PRO','openProHistoryV193()')}</div>
  <div class="card profile-v233-section"><h3>⚙️ Аккаунт</h3><p class="muted small">${esc(user.email||'')}</p>${btn('✏️ Редактировать профиль','openEditProfile()',true)}${btn('Архив покупок',"openDealArchive('buyer')")}${btn('Архив продаж',"openDealArchive('seller')")}${btn('🎁 Добрые дела — бесплатно',"navigate('kindness')")}${btn('Новые возможности ХОЧУ','openGrowthHub()')}${btn('Социальный профиль и интересы','openSocialSettings()')}${btn('Сообщества','openCommunities()')}${btn('Черновики желаний','openRequestDrafts()')}${btn('История просмотров','openViewHistory()')}${btn('ХОЧУ постоянно','openRecurringPurchases()')}${btn('Запросы на мои контакты','openContactInbox()')}${btn('Бизнес-кабинет','openBusinessHub()')}${btn('Подтверждение телефона','openPhoneVerification()')}${btn('Чёрный список','openBlockedUsers()')}${btn('🔖 Сохранённые поиски','openSavedSearches()')}${btn('♥ Избранные продавцы','openSavedSellers()')}${btn(`🔔 Уведомления (${notifications.filter(n=>!n.read_at).length})`,'openNotifications()')}${isAdmin?btn('🛡️ Панель модерации',`navigate('admin')`):''}${isOwner?btn('👑 Панель владельца',`navigate('owner')`):''}${btn('Выйти','signOut()')}</div>`;
 }
-async function signOut(){try{crowdStopRealtimeV204();const {error}=await db.auth.signOut();if(error)throw error;user=null;profile=null;requestPhotoCache.clear();aiMatchResults.clear();isAdmin=false;isOwner=false;requests=[];offers=[];offerImages=[];deals=[];reviews=[];notifications=[];subscriptions=[];matchingRequests=[];ownerUsers=[];adminReports=[];adminSuspensions=[];adminReportRequestStates=new Map();adminAuditEvents=[];adminRequestItems=[];adminSection='reports';favorites=new Set();updateBadge();renderAll();await refreshAll();navigate('home');toast('Вы вышли')}catch(e){toast('Ошибка выхода: '+e.message)}}
+async function signOut(){try{crowdStopRealtimeV204();const {error}=await db.auth.signOut();if(error)throw error;setAccountV29(null);profile=null;requestPhotoCache.clear();aiMatchResults.clear();isAdmin=false;isOwner=false;requests=[];offers=[];offerImages=[];deals=[];reviews=[];notifications=[];subscriptions=[];matchingRequests=[];ownerUsers=[];adminReports=[];adminSuspensions=[];adminReportRequestStates=new Map();adminAuditEvents=[];adminRequestItems=[];adminSection='reports';favorites=new Set();updateBadge();renderAll();await refreshAll();navigate('home');toast('Вы вышли')}catch(e){toast('Ошибка выхода: '+e.message)}}
 function openEditProfile(){
  if(!requireAuth())return;
  modal({title:'Редактировать профиль',body:`<form onsubmit="saveProfile(event)"><div class="fieldset"><label class="fieldlabel">Имя / магазин</label><input name="name" class="field" required maxlength="80" value="${esc(profile?.display_name||'')}"></div><div class="fieldset"><label class="fieldlabel">Город</label><input name="city" class="field" maxlength="100" value="${esc(profile?.city||'')}"></div><div class="fieldset"><label class="fieldlabel">Тип аккаунта</label><select class="field" name="seller_type"><option value="individual" ${profile?.seller_type!=='business'?'selected':''}>Частное лицо</option><option value="business" ${profile?.seller_type==='business'?'selected':''}>Магазин / компания</option></select></div><div class="fieldset"><label class="fieldlabel">Аватар (JPEG, PNG или WebP, до 3 МБ)</label><input type="file" accept="image/jpeg,image/png,image/webp" class="field" name="avatar"></div><div class="fieldset"><label class="fieldlabel">О себе</label><textarea name="about" class="field" maxlength="700">${esc(profile?.about||'')}</textarea></div><button class="btn block">Сохранить</button></form>`})
@@ -467,7 +463,7 @@ async function openChat(id){
  $('modal').classList.add('chat-modal');loadAuctionPanel(o.request_id);
  await Promise.all([loadMessages(id),loadChatOfferPhotos(id)]);
 }
-async function loadMessages(id){try{const {data,error}=await db.from('messages').select('id,sender_id,body,created_at').eq('offer_id',id).order('created_at');if(error)throw error;const el=$('chatMessages');if(!el||el.dataset.offerId!==id)return;el.innerHTML=(data||[]).length?data.map(m=>`<div class="bubble ${m.sender_id===user.id?'':'other'}">${esc(m.body)}<div class="muted small" style="margin-top:4px">${new Date(m.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</div></div>`).join(''):'<div class="empty">Напишите первое сообщение</div>';const scroller=el.closest('.chat-scroll');if(scroller)scroller.scrollTop=scroller.scrollHeight}catch(err){toast(err.message)}}
+async function loadMessages(id){return loadChatWindowV29('offer',id)}
 async function sendMessage(e,id){e.preventDefault();if(!user||!startAction('message:'+id))return;const input=e.target.elements.body,body=input.value.trim();try{if(!body||!approveMessageText(body))return;const {error}=await db.from('messages').insert({offer_id:id,sender_id:user.id,body});if(error)throw error;input.value='';await loadMessages(id)}catch(err){toast('Сообщение не отправлено: '+err.message)}finally{endAction('message:'+id)}}
 
 function imageExt(file){return ({'image/jpeg':'jpg','image/png':'png','image/webp':'webp'})[file.type]||'jpg'}
@@ -482,9 +478,9 @@ async function loadOfferGallery(offerId){
  host.innerHTML=parts.filter(Boolean).map(url=>`<a href="${esc(url)}" target="_blank" rel="noopener"><img loading="lazy" alt="Фото товара" src="${esc(url)}"></a>`).join('')||'<div class="muted small">Не удалось загрузить фотографии</div>';
 }
 async function loadNotifications(){
- if(!user){notifications=[];updateBadge();return}const owner=user.id;
+ if(!user){notifications=[];updateBadge();return}const stamp=accountStampV29();
  const {data,error}=await db.from('notifications').select('id,title,body,offer_id,request_id,read_at,created_at,auction_event,request_event,question_id,qa_event').order('created_at',{ascending:false}).limit(50);
- if(user?.id!==owner)return;if(error)throw error;notifications=data||[];updateBadge();
+ if(!accountCurrentV29(stamp))return;if(error)throw error;notifications=data||[];updateBadge();
 }
 function updateBadge(){const n=notifications.filter(x=>!x.read_at).length,el=$('unreadBadge');if(el){el.textContent=n>99?'99+':n;el.style.display=n?'inline':'none'}}
 async function openNotifications(){
@@ -705,45 +701,24 @@ async function loadDirectInboxV237(silent=false){
  const host=$('directChatListV237');if(!host)return;
  if(!user){host.innerHTML='<div class="empty">Войди, чтобы увидеть личные сообщения.</div>';return}
  if(dmInboxBusyV237)return;
- dmInboxBusyV237=true;
+ const stamp=accountStampV29();dmInboxBusyV237=true;
  if(!silent)host.innerHTML='<div class="loader">Загрузка личных чатов…</div>';
  try{
-  const {data,error}=await db.rpc('hochu_direct_inbox_v237');if(error)throw error;
+  const {data,error}=await db.rpc('hochu_direct_inbox_v237');if(!accountCurrentV29(stamp)||!host.isConnected)return;if(error)throw error;
   directInboxV237=Array.isArray(data)?data:[];
   updateDirectBadgeV238();
   renderDirectInboxV238();
- }catch(e){if(!silent)host.innerHTML='<div class="notice">Не удалось загрузить личные чаты: '+esc(e.message||e)+'</div>'}
- finally{dmInboxBusyV237=false}
+ }catch(e){if(accountCurrentV29(stamp)&&!silent&&host.isConnected)host.innerHTML='<div class="notice">Не удалось загрузить личные чаты: '+esc(e.message||e)+'</div>'}
+ finally{if(accountCurrentV29(stamp))dmInboxBusyV237=false}
 }
 async function openDirectChatV237(id){
  if(!requireAuth())return;
  if(!/^[0-9a-f-]{36}$/i.test(String(id)))return toast('Некорректный чат');
- const viewer=user.id;let person=directInboxV237.find(c=>c.chat_id===id);if(!person){const {data,error}=await db.rpc('hochu_direct_inbox_v237');if(user?.id!==viewer)return;if(error)return toast('Не удалось загрузить собеседника');directInboxV237=Array.isArray(data)?data:[];person=directInboxV237.find(c=>c.chat_id===id)}if(!person?.other_user_id)return toast('Чат недоступен');dmLastChatV237=id;
+ const viewer=user.id,chatStamp=accountStampV29();let person=directInboxV237.find(c=>c.chat_id===id);if(!person){const {data,error}=await db.rpc('hochu_direct_inbox_v237');if(!accountCurrentV29(chatStamp))return;if(error)return toast('Не удалось загрузить собеседника');directInboxV237=Array.isArray(data)?data:[];person=directInboxV237.find(c=>c.chat_id===id)}if(!person?.other_user_id)return toast('Чат недоступен');dmLastChatV237=id;
  modal({title:'💬 Личный чат',body:`<div class="dm-chat-person"><button class="dm-profile-link" onclick="openUserPage('${person.other_user_id}','${id}')">👤 ${esc(person.other_name||'Пользователь')} ↗</button></div><div class="workspace-actions">${person?.other_user_id?trustContactMarkup(person.other_user_id):''}${templateButtonMarkup('direct',id)}</div><div class="chat-scroll"><div class="chat" id="directMessagesV237" data-chat-id="${id}">Загрузка…</div><button class="btn ghost block chat-refresh" onclick="loadDirectMessagesV237('${id}')">↻ Обновить сообщения</button></div><form class="chat-composer" onsubmit="sendDirectMessageV237(event,'${id}')">${linkWarningMarkup()}<input oninput="updateLinkWarning(this)" class="field" name="body" maxlength="2000" required placeholder="Сообщение…" aria-label="Сообщение"><button class="btn" type="submit">➤</button></form>`});
  $('modal').classList.add('chat-modal');await loadDirectMessagesV237(id);
 }
-async function loadDirectMessagesV237(id,silent=false){
- if(dmMessagesBusyV237)return;dmMessagesBusyV237=true;
- const host=$('directMessagesV237');if(!host||host.dataset.chatId!==id){dmMessagesBusyV237=false;return;}
- try{
-  const {data,error}=await db.from('hochu_direct_messages_v237').select('id,sender_id,body,created_at,read_at').eq('chat_id',id).order('created_at',{ascending:true}).limit(200);
-  if(error)throw error;
-  if(!$('directMessagesV237')||$('directMessagesV237').dataset.chatId!==id)return;
-  const previous=host.dataset.lastMessageId||'';const latest=data?.length?data[data.length-1].id:'';
-  const stateSignature=(data||[]).map(m=>m.id+':'+(m.read_at||'')).join('|');
-  if(silent&&host.dataset.messageState===stateSignature)return;
-  host.dataset.messageState=stateSignature;host.dataset.lastMessageId=latest;
-  host.innerHTML=data?.length?data.map(m=>`<div class="bubble ${m.sender_id===user.id?'':'other'}">${esc(m.body)}<div class="small muted">${new Date(m.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</div>${m.sender_id===user.id?`<div class="dm-message-state-v238">${m.read_at?'✓✓ Прочитано':'✓ Отправлено'}</div>`:''}</div>`).join(''):'<div class="empty">Напишите первое сообщение</div>';
-  host.closest('.chat-scroll')?.scrollTo(0,host.closest('.chat-scroll').scrollHeight);
-  const hasUnread=(data||[]).some(m=>m.sender_id!==user.id&&!m.read_at);
-  if(hasUnread){
-   const marked=await db.rpc('hochu_direct_mark_read_v237',{p_chat:id});
-   if(marked.error)console.warn('Отметка прочтения:',marked.error);
-   else if(Number(marked.data)>0)dmRefreshBadgeV237();
-  }
- }catch(e){if(!silent)toast('Ошибка истории: '+(e.message||e))}
- finally{dmMessagesBusyV237=false}
-}
+async function loadDirectMessagesV237(id,silent=false){return loadChatWindowV29('direct',id,{silent})}
 async function sendDirectMessageV237(e,id){
  e.preventDefault();if(!requireAuth()||!startAction('dm:send:'+id))return;
  const input=e.target.elements.body,body=input.value.trim(),button=e.target.querySelector('button[type=submit]');
@@ -771,9 +746,9 @@ function dmStartPollingV237(){
 }
 async function dmRefreshBadgeV237(){
  if(!user||!db)return;
- if(dmInboxBusyV237)return;
+ if(dmInboxBusyV237)return;const stamp=accountStampV29();
  const {data,error}=await db.rpc('hochu_direct_inbox_v237');
- if(error)return;
+ if(!accountCurrentV29(stamp)||error)return;
  directInboxV237=Array.isArray(data)?data:[];
  updateDirectBadgeV238();
  if(mode==='inbox'&&inboxModeV237==='direct')renderDirectInboxV238();
@@ -833,13 +808,15 @@ async function submitReview(e,id){
 // ===== ХОЧУ. 9.0 — подбор по подпискам =====
 async function loadSellerSubscriptions(){
  if(!user){subscriptions=[];return}
+ const stamp=accountStampV29();
  const {data,error}=await db.from('seller_subscriptions').select('id,seller_id,category,city,min_budget,max_budget,enabled,created_at').order('created_at',{ascending:false});
- if(error)throw error;subscriptions=data||[];
+ if(!accountCurrentV29(stamp))return;if(error)throw error;subscriptions=data||[];
 }
 async function loadMatchingRequests(){
  if(!user){matchingRequests=[];return}
+ const stamp=accountStampV29();
  const {data,error}=await db.rpc('hochu_matching_requests_v9');
- if(error)throw error;matchingRequests=data||[];
+ if(!accountCurrentV29(stamp))return;if(error)throw error;matchingRequests=data||[];
 }
 // v17: объяснимый рейтинг на клиенте. Сервер v9 определяет допуск к заявкам.
 function normalizeMatchText(x){return String(x||'').trim().toLocaleLowerCase('ru-RU')}
@@ -932,24 +909,25 @@ async function submitReport(e,type,id){
 }
 const reasons={spam:'Спам',fraud:'Мошенничество',prohibited:'Запрещённый контент',abuse:'Оскорбления',other:'Другое'};
 async function loadAdminPanel(){
+ const stamp=accountStampV29();
  const el=$('adminContent');if(!el)return;
  if(!user||!isAdmin){el.innerHTML='<div class="notice">Нет доступа к панели. Назначьте свой UUID администратором через SQL Editor.</div>';return}
  el.innerHTML='<div class="empty">Загрузка модерации…</div>';
  try{
   const [a,b]=await Promise.all([db.from('hochu_reports').select('id,reporter_id,target_type,target_id,reason,details,status,created_at').order('created_at',{ascending:false}).limit(100),db.rpc('hochu_admin_suspensions_v10')]);
-  if(a.error)throw a.error;if(b.error)throw b.error;adminReports=a.data||[];adminSuspensions=b.data||[];
+  if(!accountCurrentV29(stamp)||!el.isConnected)return;if(a.error)throw a.error;if(b.error)throw b.error;adminReports=a.data||[];adminSuspensions=b.data||[];
   // Состояние самой заявки отдельно от статуса жалобы. Читаем актуальные данные из Supabase.
   const requestIds=[...new Set(adminReports.filter(r=>r.target_type==='request').map(r=>r.target_id))];
   adminReportRequestStates=new Map();
   if(requestIds.length){
    const rs=await db.from('requests').select('id,is_hidden').in('id',requestIds);
-   if(rs.error)throw rs.error;
+   if(!accountCurrentV29(stamp)||!el.isConnected)return;if(rs.error)throw rs.error;
    for(const row of rs.data||[])adminReportRequestStates.set(row.id,!!row.is_hidden);
   }
   renderAdminPanel();
   if(adminSection==='requests')await loadAdminRequests();
   if(adminSection==='audit')await loadAdminAudit();
- }catch(err){el.innerHTML='<div class="notice">Ошибка: '+esc(err.message)+'</div>'}
+ }catch(err){if(!accountCurrentV29(stamp)||!el.isConnected)return;el.innerHTML='<div class="notice">Ошибка: '+esc(err.message)+'</div>'}
 }
 function adminReportCard(r){
  const isRequest=r.target_type==='request';
@@ -1101,6 +1079,7 @@ function adminRequestCard(r){
  ${hidden?`<button class="btn gray" onclick="adminAction('show_request','${r.id}')">Вернуть заявку</button>`:`<button class="btn warn" onclick="adminAction('hide_request','${r.id}')">Скрыть заявку</button>`}</div></div>`;
 }
 async function loadAdminRequests(more=false){
+ const stamp=accountStampV29();
  if(!user||!isAdmin||adminSection!=='requests')return;
  const el=$('adminRequestResults');if(!el)return;
  if(!more){adminRequestItems=[];adminRequestOffset=0;el.innerHTML='<div class="empty">Идёт поиск…</div>'}
@@ -1115,38 +1094,40 @@ async function loadAdminRequests(more=false){
    if(isUuid)q=q.or(`id.eq.${val},buyer_id.eq.${val}`);
    else q=q.ilike('title','%'+val.replace(/[%_]/g,'')+'%');
   }
-  const {data,error}=await q;if(error)throw error;
+  const {data,error}=await q;if(!accountCurrentV29(stamp)||!el.isConnected)return;if(error)throw error;
   adminRequestItems=more?[...adminRequestItems,...(data||[])]:data||[];
   adminRequestOffset+=data?.length||0;
   adminRequestHasMore=(data||[]).length===50;
   const view=$('adminRequestResults');if(!view)return;
   view.innerHTML=adminRequestItems.length?`<p class="muted small">Загружено: ${adminRequestItems.length}</p>${adminRequestItems.map(adminRequestCard).join('')}${adminRequestHasMore?'<button class="btn ghost block" onclick="loadAdminRequests(true)">Показать ещё 50</button>':''}`:'<div class="empty">Заявки не найдены</div>';
- }catch(err){const view=$('adminRequestResults');if(view)view.innerHTML=`<div class="notice">Ошибка поиска: ${esc(err.message)}</div>`;}
+ }catch(err){if(!accountCurrentV29(stamp)||!el.isConnected)return;const view=$('adminRequestResults');if(view)view.innerHTML=`<div class="notice">Ошибка поиска: ${esc(err.message)}</div>`;}
 }
 function adminAuditMarkup(){
  return `<h2>История модерации</h2><p class="muted small">Последние 100 успешных административных действий, полученные через защищённую RPC-функцию.</p>
  <button class="btn ghost" onclick="loadAdminAudit()">↻ Обновить историю</button><div id="adminAuditResults" style="margin-top:12px"><div class="empty">Загрузка…</div></div>`;
 }
 async function loadAdminAudit(){
+ const stamp=accountStampV29();
  if(!user||!isAdmin||adminSection!=='audit')return;
  const el=$('adminAuditResults');if(!el)return;
  el.innerHTML='<div class="empty">Загрузка истории…</div>';
  try{
-  const {data,error}=await db.rpc('hochu_admin_audit_list_v161');if(error)throw error;
+  const {data,error}=await db.rpc('hochu_admin_audit_list_v161');if(!accountCurrentV29(stamp)||!el.isConnected)return;if(error)throw error;
   adminAuditEvents=data||[];
   el.innerHTML=adminAuditEvents.length?adminAuditEvents.map(item=>`<div class="card">
   <b>${esc(item.action)}</b><p class="muted small" style="overflow-wrap:anywhere">${new Date(item.created_at).toLocaleString('ru-RU')}<br>Администратор: ${esc(item.admin_id)}<br>Объект: ${esc(item.target_id||'—')}</p>
   ${item.details&&Object.keys(item.details).length?`<p class="small" style="overflow-wrap:anywhere">${esc(JSON.stringify(item.details))}</p>`:''}</div>`).join(''):'<div class="empty">История пока пуста</div>';
- }catch(err){el.innerHTML=`<div class="notice">Не удалось прочитать журнал: ${esc(err.message)}. Сначала установи SQL v16.1.</div>`}
+ }catch(err){if(!accountCurrentV29(stamp)||!el.isConnected)return;el.innerHTML=`<div class="notice">Не удалось прочитать журнал: ${esc(err.message)}. Сначала установи SQL v16.1.</div>`}
 }
 
 async function loadOwnerPanel(){
+ const stamp=accountStampV29();
  const el=$('ownerContent');if(!el)return;
  if(!user||!isOwner){el.innerHTML='<div class="empty">Доступ только владельцу</div>';return}
  el.innerHTML='<div class="loader">Загружаем статистику…</div>';
  try{
   const [dash,people]=await Promise.all([db.rpc('hochu_owner_dashboard_v11'),db.rpc('hochu_owner_users_v12')]);
-  if(dash.error)throw dash.error;if(people.error)throw people.error;
+  if(!accountCurrentV29(stamp)||!el.isConnected)return;if(dash.error)throw dash.error;if(people.error)throw people.error;
   const d=dash.data||{};ownerUsers=people.data||[];
   const count=x=>Number(x||0).toLocaleString('ru-RU');
   const metrics=[['👥 Пользователи',d.users],['📋 Заявки',d.requests],['🛍️ Предложения',d.offers],['🤝 Сделки',d.deals],['🚩 Открытые жалобы',d.open_reports],['🛡️ Модераторы',d.moderators]];
@@ -1155,15 +1136,16 @@ async function loadOwnerPanel(){
   '<p class="notice">🔐 v15: ограничение кнопок в браузере не заменяет серверные проверки. Перед публичным запуском проверь SQL-аудит RLS, доступы RPC и Storage. Отчёт не изменяет данные.</p>';
   renderOwnerUsers();
   await loadOwnerAnalytics();
- }catch(e){el.innerHTML=`<div class="notice">Ошибка панели владельца: ${esc(e.message)}. Сначала выполни SQL-файл обновления в Supabase.</div>`}
+ }catch(e){if(!accountCurrentV29(stamp)||!el.isConnected)return;el.innerHTML=`<div class="notice">Ошибка панели владельца: ${esc(e.message)}. Сначала выполни SQL-файл обновления в Supabase.</div>`}
 }
 
 // ХОЧУ v13 — только агрегированная аналитика, через проверку роли владельца на сервере.
 async function loadOwnerAnalytics(){
+ const stamp=accountStampV29();
  const host=$('ownerAnalytics');if(!host)return;
  host.innerHTML='<div class="loader">Загрузка аналитики…</div>';
  try{
-  const {data:d,error}=await db.rpc('hochu_owner_analytics_v13');if(error)throw error;
+  const {data:d,error}=await db.rpc('hochu_owner_analytics_v13');if(!accountCurrentV29(stamp)||!host.isConnected)return;if(error)throw error;
   const num=x=>Number(x||0).toLocaleString('ru-RU');
   const rub=x=>num(x)+' ₽';
   const cards=[['Регистрации сегодня',num(d.users_today)],['Регистрации за 7 дней',num(d.users_7d)],['Регистрации за 30 дней',num(d.users_30d)],['Заявки за 30 дней',num(d.requests_30d)],['Предложения за 30 дней',num(d.offers_30d)],['Завершённые сделки',num(d.completed_deals)],['Конверсия заявок в завершённые сделки',num(d.conversion_percent)+'%'],['Расчётный оборот завершённых сделок',rub(d.completed_value)]];
@@ -1174,7 +1156,7 @@ async function loadOwnerAnalytics(){
    '<h2>📈 Последние 14 дней</h2><div class="card"><p class="small muted">Фиолетовый — заявки, голубой — регистрации. Шкала общая.</p><div style="display:flex;gap:5px;align-items:end;height:150px;overflow-x:auto">'+daily.map(x=>'<div style="flex:1;min-width:24px;text-align:center"><div style="height:115px;display:flex;align-items:end;justify-content:center;gap:2px"><div title="Заявки: '+num(x.requests)+'" style="width:9px;height:'+Math.max(2,Math.round(Number(x.requests||0)/max*110))+'px;background:#6554d7;border-radius:3px 3px 0 0"></div><div title="Регистрации: '+num(x.users)+'" style="width:9px;height:'+Math.max(2,Math.round(Number(x.users||0)/max*110))+'px;background:#63b6ee;border-radius:3px 3px 0 0"></div></div><div class="muted" style="font-size:9px">'+esc(x.day)+'</div></div>').join('')+'</div></div>'+
    '<h2>🏷️ Категории по количеству заявок</h2><div class="card">'+(cats.length?cats.map(x=>'<div style="margin:12px 0"><div class="row between"><span>'+esc(x.category)+'</span><b>'+num(x.requests)+'</b></div><div style="background:#efedfa;border-radius:8px;height:9px;margin-top:5px"><div style="height:9px;border-radius:8px;background:#6554d7;width:'+Math.round(Number(x.requests||0)/maxCat*100)+'%"></div></div></div>').join(''):'<p class="muted">Пока нет заявок</p>')+'</div>'+
    '<p class="notice">Оборот рассчитан по ценам выбранных предложений в завершённых сделках. Платежи не проверяются. Конверсия = завершённые сделки / все созданные заявки; это не конверсия уникальных покупателей.</p>';
- }catch(e){host.innerHTML='<div class="notice">Аналитика v13 недоступна: '+esc(e.message)+'. Выполни SQL-обновление v13 в Supabase.</div>'}
+ }catch(e){if(!accountCurrentV29(stamp)||!host.isConnected)return;host.innerHTML='<div class="notice">Аналитика v13 недоступна: '+esc(e.message)+'. Выполни SQL-обновление v13 в Supabase.</div>'}
 }
 
 function renderOwnerUsers(){
@@ -1264,7 +1246,7 @@ async function openProDemandAnalyticsV191(){
  }catch(e){modal({title:'📈 PRO · Аналитика спроса',body:'<div class="notice">Не удалось получить статистику: '+esc(e.message||'Ошибка')+'. Сначала установи SQL v19.1.</div>'})}
 }
 
-function initialize(){if(!configured){refreshAll();return}if(!window.supabase?.createClient){toast('Ошибка загрузки библиотеки Supabase');return}db=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseKey);db.auth.onAuthStateChange((event,session)=>{const newId=session?.user?.id||null;if(newId!==user?.id){user=session?.user||null;favorites=new Set(JSON.parse(localStorage.getItem('hochu_favorites_'+(newId||'guest'))||'[]'));setTimeout(refreshAll,0)}});refreshAll().then(()=>{if(new URLSearchParams(window.location.search).has('wish'))openSharedWish();else if(new URLSearchParams(window.location.search).has('social'))openSocialProfile(new URLSearchParams(window.location.search).get('social'));else if(new URLSearchParams(window.location.search).has('store'))openPublicStore(new URLSearchParams(window.location.search).get('store'));else if(new URLSearchParams(window.location.search).has('seller'))openSharedSellerV235();else openCrowdInviteV201()})}
+function initialize(){if(!configured){refreshAll();return}if(!window.supabase?.createClient){toast('Ошибка загрузки библиотеки Supabase');return}db=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseKey);db.auth.onAuthStateChange(handleAuthV29);refreshAll().then(()=>{if(recoveryLandingV29())return;if(new URLSearchParams(window.location.search).has('wish'))openSharedWish();else if(new URLSearchParams(window.location.search).has('social'))openSocialProfile(new URLSearchParams(window.location.search).get('social'));else if(new URLSearchParams(window.location.search).has('store'))openPublicStore(new URLSearchParams(window.location.search).get('store'));else if(new URLSearchParams(window.location.search).has('seller'))openSharedSellerV235();else openCrowdInviteV201()})}
 initialize();
 
 
