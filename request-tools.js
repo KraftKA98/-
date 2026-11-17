@@ -99,7 +99,7 @@ function requestFormMarkup(prefill={}){
     <label class="fieldset" style="display:block"><span class="fieldlabel">Город</span><input class="field" name="city" minlength="2" maxlength="100" required value="${esc(prefill.city||profile?.city||'')}"></label>
     <label class="fieldset" style="display:block"><span class="fieldlabel">Дополнительные пожелания</span><textarea class="field" name="description" maxlength="2000" placeholder="Что ещё важно?">${esc(prefill.description||'')}</textarea></label>
     ${!prefill.id&&typeof requestLifetimeFieldMarkup==='function'?requestLifetimeFieldMarkup(prefill.valid_for_days||30):''}${requestPhotoEditorMarkup()}<p class="small muted">Характеристики войдут в описание. Общая длина — до 2000 символов.</p>
-    <button class="btn block" type="submit">Опубликовать запрос</button></form>`;
+    <button class="btn block" type="submit">Опубликовать желание</button></form>`;
 }
 function createWishFromSearch(source){
   const home=source==='home';
