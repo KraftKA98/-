@@ -5,11 +5,11 @@ function requestFieldDefinitions(category){
   if(group==='Недвижимость')return [
     ['intent','Что нужно','select',['Купить','Снять на длительный срок','Снять посуточно']],
     ['district','Район или ориентир','text'],['area','Площадь от, м²','number'],
-    ['rooms','Количество комнат','text']];
+    ['rooms','Количество комнат','text'],['deadline','Желаемый срок','date']];
   if(group==='Работа')return [
     ['role','Ваша цель','select',['Ищу работу','Ищу сотрудника']],
     ['schedule','График','select',['Полный день','По сменам','Гибкий график','Удалённо','Подработка']],
-    ['position','Должность или специализация','text']];
+    ['position','Должность или специализация','text'],['deadline','Желаемый срок','date']];
   if(group==='Услуги')return [
     ['task','Что нужно сделать','text'],['location','Где выполнить','text'],
     ['deadline','Желаемый срок','date']];
@@ -19,6 +19,7 @@ function requestFieldDefinitions(category){
   if(group==='Электроника'||group==='Компьютеры')fields.push(['specs','Память и важные характеристики','text']);
   if(['Одежда','Детские товары'].includes(group))fields.push(['size','Размер','text']);
   if(group==='Авто')fields.push(['year','Год выпуска от','number'],['mileage','Пробег до, км','number']);
+  fields.push(['deadline','Желаемый срок','date']);
   if(isCarModelCategory(category))return [['model','Модель','text'],['generation','Поколение','text'],['year','Год выпуска от','number'],['mileage','Пробег до, км','number'],['gearbox','Коробка передач','select',['Механическая','Автоматическая','Робот','Вариатор','Не имеет значения']],...fields.filter(field=>!['model','year','mileage'].includes(field[0]))];
   if(isPhoneModelCategory(category)){fields.splice(1,0,['storage','Встроенная память','text']);for(const field of fields)if(field[0]==='specs')field[1]='Другие характеристики'}
   return fields;
@@ -77,7 +78,7 @@ function requestDescription(formData,category){
     if(value.length>120||(type==='select'&&!options.includes(value)))throw Error('Проверьте характеристики');
     if(key==='year'&&(Number(value)<1886||Number(value)>new Date().getFullYear()+1))throw Error('Проверьте год выпуска');
     if(type==='number'&&(!Number.isFinite(Number(value))||Number(value)<0||Number(value)>1000000000))throw Error('Проверьте числовые характеристики');
-    if(type==='date'&&!/^\d{4}-\d{2}-\d{2}$/.test(value))throw Error('Проверьте дату');
+    if(type==='date'&&(!/^\d{4}-\d{2}-\d{2}$/.test(value)||!Number.isFinite(Date.parse(value+'T00:00:00Z'))||new Date(value+'T00:00:00Z').toISOString().slice(0,10)!==value))throw Error('Проверьте дату');
     lines.push(label+': '+value);
   }
   const intent=String(formData.get('detail_intent')||'');

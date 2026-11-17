@@ -43,7 +43,7 @@ function requestPhotoEditorMarkup(){
 function renderRequestPhotoDraft(){
   const host=$('requestPhotoDraft'),state=requestEditorState;if(!host||!state)return;
   host.innerHTML=state.keep.map((path,i)=>`<div class="request-photo-item"><img data-request-photo="${esc(path)}" alt="Прикреплённое фото" hidden><button type="button" class="request-photo-remove" aria-label="Убрать фото ${i+1}" onclick="removeRequestPhoto('keep',${i})">×</button></div>`).join('')+state.files.map((item,i)=>`<div class="request-photo-item"><img src="${esc(item.url)}" alt="Новое фото ${i+1}"><button type="button" class="request-photo-remove" aria-label="Убрать новое фото ${i+1}" onclick="removeRequestPhoto('new',${i})">×</button></div>`).join('');
-  queueRequestPhotos();
+  queueRequestPhotos();if(typeof updateWishGuidanceV32==='function')updateWishGuidanceV32();
 }
 function addRequestPhotos(input){
   const state=requestEditorState;if(!state||state.busy)return;
@@ -97,7 +97,7 @@ function openRequestEditor(id=null,prefill={}){
     const option=new Option(original.category,original.category,true,true);form.elements.categoryParent.add(option);form.elements.category.value=original.category;
   }
   for(const [key,value] of Object.entries(values.details||{})){const field=form.elements['detail_'+key];if(field)field.value=value}
-  refreshRequestBudget(form);renderRequestPhotoDraft();if(typeof socialBindDraft==='function')socialBindDraft(form);
+  refreshRequestBudget(form);renderRequestPhotoDraft();if(typeof socialBindDraft==='function')socialBindDraft(form);if(typeof bindWishGuidanceV32==='function')bindWishGuidanceV32(form);
 }
 function validateRequestRecord(record,original){
   if(!isKnownCategory(record.category)&&record.category!==original?.category)throw Error('Выберите категорию');
