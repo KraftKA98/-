@@ -3,7 +3,7 @@ let callV38=null,callPollBusyV38=false,callPollAtV38=0,callViewerV38=null,callSo
 const callTokenV38=crypto.randomUUID();
 const callStatesV38={ringing:'Вызываем…',accepted:'Соединяем…',ended:'Звонок завершён',declined:'Вызов отклонён',missed:'Нет ответа',failed:'Не удалось соединиться'};
 function callButtonV38(kind,id){return `<button type="button" class="call-button-v38" aria-label="Позвонить через интернет" title="Аудиозвонок" onclick="startCallV38('${kind}','${id}')">☎</button>`}
-function callToolsV38(kind,id){return `<button type="button" class="btn ghost block" onclick="openCallHistoryV38('${kind}','${id}')">☎ История звонков</button><button type="button" class="btn ghost block" onclick="openCallPreferencesV38()">Настройки звонков</button>`}
+function callToolsV38(kind,id){return `<button type="button" class="btn ghost block" onclick="openCallHistoryV38('${kind}','${id}')">☎ История звонков</button><button type="button" class="btn ghost block" onclick="openCallPreferencesV38()">Настройки звонков</button><button type="button" class="btn ghost block" onclick="openPhoneSettingsV39()">Телефон и видимость номера</button>`}
 async function callRpcV38(action,data={}){const{data:result,error}=await db.rpc('hochu_calls_v38',{p_action:action,p_data:{...data,token:callTokenV38}});if(error)throw error;return result}
 function validCallV38(s){return !!s&&callV38===s&&!s.disposed&&accountCurrentV29(s.stamp)}
 function callHostV38(){let h=$('callPanelV38');if(!h){h=document.createElement('aside');h.id='callPanelV38';h.setAttribute('aria-label','Аудиозвонок');document.body.append(h)}return h}
