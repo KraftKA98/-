@@ -97,7 +97,7 @@ function openRequestEditor(id=null,prefill={}){
     const option=new Option(original.category,original.category,true,true);form.elements.categoryParent.add(option);form.elements.category.value=original.category;
   }
   for(const [key,value] of Object.entries(values.details||{})){const field=form.elements['detail_'+key];if(field)field.value=value}
-  refreshRequestBudget(form);renderRequestPhotoDraft();if(typeof socialBindDraft==='function')socialBindDraft(form);if(typeof bindWishGuidanceV32==='function')bindWishGuidanceV32(form);
+  refreshRequestBudget(form);renderRequestPhotoDraft();if(typeof socialBindDraft==='function')socialBindDraft(form);if(typeof bindWishGuidanceV32==='function')bindWishGuidanceV32(form);if(typeof simplifyWishFormV36==='function')simplifyWishFormV36(form);
 }
 function validateRequestRecord(record,original){
   if(!isKnownCategory(record.category)&&record.category!==original?.category)throw Error('Выберите категорию');
