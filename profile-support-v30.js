@@ -6,7 +6,7 @@ function compactProfileV30(btn){const group=(title,items)=>`<details class="prof
 ['Карта, индекс спроса и прогноз','openDemandMap()'],['📈 PRO · Аналитика спроса','openProDemandAnalyticsV191()'],['Отчёт для производителя','openManufacturerReport()']])+group('📣 Продвижение',[
 ['Закрытые скидки и автоторг','openPrivateQuotes()'],['Рекомендации за результат','openReferralHub()'],['Рекламные кампании магазинов',"openPromotionV34()"]])+group('👥 Сообщества и интересы',[
 ['Социальный профиль и интересы','openSocialSettings()'],['Сообщества','openCommunities()']])+group('⭐ Тарифы',[
-['⭐ Тарифы Free / PRO','openProPlansV19()'],['📜 История PRO','openProHistoryV193()']])+group('⚙️ Настройки и безопасность',[
+['🧩 Собрать свой тариф','openBusinessPlans()'],['📜 История PRO','openProHistoryV193()']])+group('⚙️ Настройки и безопасность',[
 ['✏️ Редактировать профиль','openEditProfile()'],['Подтверждение телефона','openPhoneVerification()'],['Чёрный список','openBlockedUsers()'],['🗑️ Удалить аккаунт','openAccountDeletionV31()'],['Очистить неотправленные вложения','cleanUnsentFilesV30(this)']])+(isAdmin||isOwner?group('🛡️ Управление',[
 ...(isAdmin?[['🛡️ Панель модерации',"navigate('admin')"],['Очередь поддержки','openSupportV30(true)']]:[]),...(isOwner?[['👑 Панель владельца',"navigate('owner')"]]:[]) ]):'')+`<div class="profile-footer"><span class="small muted">${esc(user.email||'')}</span>${btn('Выйти','signOut()')}</div>`}
 async function serviceRpcV30(action,data={}){const {data:result,error}=await db.rpc('hochu_service_v30',{p_action:action,p_data:data});if(error)throw error;return result}
