@@ -24,3 +24,6 @@ function restorePageV36(page,preserve=false){pageRestoreObserverV36?.disconnect(
 function stopRestoreV36(){scrollSequenceV36++;pageRestoreObserverV36?.disconnect()}
 for(const type of ['wheel','touchstart'])document.addEventListener(type,stopRestoreV36,{passive:true});
 document.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(e.key)&&!e.target.closest('input,textarea,select,[contenteditable=true]'))stopRestoreV36()});
+
+function compactChatRefreshV36(kind,id){return `<button type="button" class="chat-refresh-compact-v36" aria-label="Обновить сообщения" title="Обновить сообщения" onclick="refreshChatCompactV36('${kind}','${id}',this)"><span aria-hidden="true">↻</span></button>`}
+async function refreshChatCompactV36(kind,id,button){if(button.disabled)return;const stamp=accountStampV29();button.disabled=true;button.setAttribute('aria-busy','true');try{if(kind==='direct')await loadDirectMessagesV237(id);else await loadMessages(id)}catch(e){if(accountCurrentV29(stamp)&&button.isConnected)toast(workspaceError(e))}finally{if(button.isConnected){button.disabled=false;button.removeAttribute('aria-busy')}}}
