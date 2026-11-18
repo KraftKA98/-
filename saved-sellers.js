@@ -4,16 +4,17 @@ function syncSavedSellerIdentity(){
  const owner=user?.id||null;if(savedSellerState.owner===owner)return;
  savedSellerState=newSavedSellerState(owner);updateSavedSellerButtons();renderSavedSellers();
 }
-function savedSellerButtonMarkup(id){
+function savedSellerButtonMarkup(id,iconOnly=false){
  if(!/^[0-9a-f-]{36}$/i.test(String(id))||user?.id===id)return '';
  scheduleSavedSellerIds();const saved=savedSellerState.owner===user?.id&&savedSellerState.ids.has(id),busy=savedSellerState.busy.has(id);
+ if(iconOnly)return `<button class="card-icon-v45 ${saved?'is-saved':''}" data-saved-seller="${id}" data-saved-seller-icon aria-label="${saved?'Убрать продавца из избранных':'Сохранить продавца'}" title="${saved?'Убрать продавца из избранных':'Сохранить продавца'}" aria-pressed="${saved}" ${busy?'disabled':''} onclick="setSavedSeller('${id}',${!saved},'${user?.id||''}')"><span aria-hidden="true">${saved?'♥':'♡'}</span></button>`;
  return `<button class="btn ghost saved-seller-button" data-saved-seller="${id}" aria-pressed="${saved}" ${busy?'disabled':''} onclick="setSavedSeller('${id}',${!saved},'${user?.id||''}')">${saved?'♥ Убрать из избранных':'♡ Сохранить продавца'}</button>`;
 }
 function updateSavedSellerButtons(){
  for(const button of document.querySelectorAll('[data-saved-seller]')){
   const id=button.dataset.savedSeller,saved=savedSellerState.owner===user?.id&&savedSellerState.ids.has(id),busy=savedSellerState.busy.has(id);
   button.hidden=user?.id===id;button.disabled=busy;button.setAttribute('aria-pressed',String(saved));button.setAttribute('aria-busy',String(busy));
-  button.textContent=busy?'Сохраняем…':saved?'♥ Убрать из избранных':'♡ Сохранить продавца';button.setAttribute('onclick',`setSavedSeller('${id}',${!saved},'${user?.id||''}')`);
+  if(button.hasAttribute('data-saved-seller-icon')){button.classList.toggle('is-saved',saved);button.setAttribute('aria-label',busy?'Сохраняем продавца':saved?'Убрать продавца из избранных':'Сохранить продавца');button.title=busy?'Сохраняем продавца':saved?'Убрать продавца из избранных':'Сохранить продавца';button.innerHTML='<span aria-hidden="true">'+(saved?'♥':'♡')+'</span>'}else button.textContent=busy?'Сохраняем…':saved?'♥ Убрать из избранных':'♡ Сохранить продавца';button.setAttribute('onclick',`setSavedSeller('${id}',${!saved},'${user?.id||''}')`);
  }
 }
 function scheduleSavedSellerIds(){
