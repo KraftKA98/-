@@ -5,7 +5,7 @@ function requestIsCurrent(request){return !requestLifetimeExpired(request)}
 function requestLifetimeFieldMarkup(days=30){return `<label class="fieldset"><span class="fieldlabel">Срок актуальности желания</span><select class="field" name="valid_for_days">${[7,14,30,90].map(n=>`<option value="${n}" ${Number(days)===n?'selected':''}>${n} дней</option>`).join('')}</select><span class="small muted">После окончания желание закроется для новых предложений. Его можно подтвердить и продлить.</span></label>`}
 function requestLifetimeCreatedFields(days){return {valid_for_days:days,expires_at:new Date(requestLifetimeNow()+days*86400000).toISOString(),last_confirmed_at:new Date(requestLifetimeNow()).toISOString(),expired_at:null}}
 function requestLifetimeBadge(request){
- if(deals.some(d=>d.request_id===request.id))return '';
+ if(deals.some(d=>d.request_id===request.id)||(typeof auctionFeedSummaries!=='undefined'&&auctionFeedSummaries.has(request.id)))return '';
  if(requestLifetimeExpired(request))return '<p class="small request-lifetime-expired">⌛ Срок актуальности истёк</p>';
  return request.expires_at?`<p class="small muted">Актуально до ${esc(new Date(request.expires_at).toLocaleDateString('ru-RU'))}</p>`:'';
 }
