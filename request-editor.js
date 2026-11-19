@@ -97,7 +97,7 @@ function openRequestEditor(id=null,prefill={}){
     const option=new Option(original.category,original.category,true,true);form.elements.categoryParent.add(option);form.elements.category.value=original.category;
   }
   for(const [key,value] of Object.entries(values.details||{})){const field=form.elements['detail_'+key];if(field)field.value=value}
-  refreshRequestBudget(form);renderRequestPhotoDraft();if(typeof socialBindDraft==='function')socialBindDraft(form);if(typeof bindWishGuidanceV32==='function')bindWishGuidanceV32(form);if(typeof simplifyWishFormV36==='function')simplifyWishFormV36(form);if(!original)addSharingFieldsV49(form);
+  refreshRequestBudget(form);renderRequestPhotoDraft();if(typeof socialBindDraft==='function')socialBindDraft(form);if(typeof bindWishGuidanceV32==='function')bindWishGuidanceV32(form);if(typeof simplifyWishFormV36==='function')simplifyWishFormV36(form);addSharingFieldsV49(form,original?.id||null);
 }
 function validateRequestRecord(record,original){
   if(!isKnownCategory(record.category)&&record.category!==original?.category)throw Error('Выберите категорию');
@@ -136,7 +136,7 @@ async function submitRequestEditor(event){
     }
     const removed=requestPhotoPaths(state.original).filter(path=>!state.keep.includes(path));
     await removeUnreferencedRequestPhotos(removed);
-    const sharingWarning=createdNow?await saveCreationSharingV49(saved.id,values,actor):'';if(user?.id!==actor)return;
+    const sharingWarning=await saveCreationSharingV49(saved.id,values,actor);if(user?.id!==actor)return;
     state.busy=false;if(typeof socialDraftPublished==='function')socialDraftPublished(state.id);closeModal();
     requests=requests.filter(request=>request.id!==saved.id);requests.unshift(saved);renderAll();
     await refreshAll();
