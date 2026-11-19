@@ -90,7 +90,7 @@ function openRequestEditor(id=null,prefill={}){
   const values=original?requestEditPrefill(original):prefill;
   let body=requestFormMarkup(values);
   if(original)body='<p class="small muted">Изменения увидят продавцы. Полученные предложения сохранятся со своими прежними условиями.</p>'+body.replace('Опубликовать желание','Сохранить изменения');
-  modal({title:original?'Редактировать желание':'Новое желание',body});
+  enterViewV50('editor:'+(id||'new'),()=>openRequestEditor(id,prefill));modal({title:original?'Редактировать желание':'Новое желание',body});
   requestEditorState={id:original?.id||crypto.randomUUID(),original,revision:original?.revision||0,editing:!!original,keep:requestPhotoPaths(original),files:[],busy:false};
   const form=$('modal').querySelector('form');
   if(original&&!isKnownCategory(original.category)){
