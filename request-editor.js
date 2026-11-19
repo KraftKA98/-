@@ -10,7 +10,7 @@ function editableWish(request){return !!request&&request.buyer_id===user?.id&&re
 function requestPhotoPaths(request){return Array.isArray(request?.image_paths)?request.image_paths.filter(path=>typeof path==='string').slice(0,5):[]}
 function requestPhotosMarkup(request,cover=false){
   const paths=requestPhotoPaths(request);if(!paths.length)return '';
-  if(cover)return `<div class="request-cover"><img data-request-photo="${esc(paths[0])}" loading="lazy" alt="Фото к желанию" hidden><span class="chip">📷 ${paths.length}</span></div>`;
+  if(cover)return `<div class="request-cover"><img data-request-photo="${esc(paths[0])}" loading="lazy" alt="Фото к желанию" hidden><span class="chip">📷 ${paths.length}</span><button type="button" class="photo-retry-v51 btn ghost" aria-label="Повторить загрузку фото" onclick="retryRequestPhotoV51(this)" hidden>Повторить фото</button></div>`;
   return `<div class="request-photo-gallery">${paths.map(path=>`<a data-request-photo-link="${esc(path)}" target="_blank" rel="noopener" hidden><img data-request-photo="${esc(path)}" loading="lazy" alt="Фото к желанию" hidden></a>`).join('')}</div>`;
 }
 function queueRequestPhotos(){
@@ -31,8 +31,8 @@ function queueRequestPhotos(){
     }
     if(viewer!==(user?.id||'guest'))return;
     for(const image of document.querySelectorAll('img[data-request-photo]')){
-      const record=requestPhotoCache.get(image.dataset.requestPhoto);if(!record||record.expires<Date.now())continue;
-      image.src=record.url;image.hidden=false;
+      const record=requestPhotoCache.get(image.dataset.requestPhoto);if(!record||record.expires<Date.now()){if(typeof markRequestPhotoV51==='function')markRequestPhotoV51(image,false);continue}
+      if(typeof prepareRequestPhotoV51==='function')prepareRequestPhotoV51(image);image.src=record.url;image.hidden=false;
       const link=image.closest('a[data-request-photo-link]');if(link){link.href=record.url;link.hidden=false}
     }
   }).catch(()=>{});

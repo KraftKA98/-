@@ -35,6 +35,7 @@ function updateAuctionControls(id){
  for(const button of document.querySelectorAll('[data-auction-bid]'))if(button.dataset.auctionBid===id)button.disabled=!state||state.status!=='active'||auctionRemaining(state)===0;
  for(const button of document.querySelectorAll('[data-auction-select]'))if(button.dataset.auctionSelect===id){button.disabled=!auctionSelectionAllowed(id);button.title=button.disabled?'Выбор после окончания торгов':''}
  for(const button of document.querySelectorAll('[data-auction-edit]'))if(button.dataset.auctionEdit===id){button.disabled=!!state&&state.status!=='none';button.title=button.disabled?'Условия желания зафиксированы торгами':''}
+ if(typeof balanceRequestPrimaryV51==='function')balanceRequestPrimaryV51(id);
 }
 async function reloadAuctionOffers(id,owner){
  const {data,error}=await db.from('offers').select('id,request_id,seller_id,price,description,created_at').eq('request_id',id).order('created_at',{ascending:false});if(error)throw error;
