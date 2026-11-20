@@ -35,10 +35,10 @@ function updateAuctionControls(id){
  for(const button of document.querySelectorAll('[data-auction-bid]'))if(button.dataset.auctionBid===id)button.disabled=!state||state.status!=='active'||auctionRemaining(state)===0;
  for(const button of document.querySelectorAll('[data-auction-select]'))if(button.dataset.auctionSelect===id){button.disabled=!auctionSelectionAllowed(id);button.title=button.disabled?'Выбор после окончания торгов':''}
  for(const button of document.querySelectorAll('[data-auction-edit]'))if(button.dataset.auctionEdit===id){button.disabled=!!state&&state.status!=='none';button.title=button.disabled?'Условия желания зафиксированы торгами':''}
- if(typeof balanceRequestPrimaryV51==='function')balanceRequestPrimaryV51(id);
+ if(typeof balanceRequestPrimaryV51==='function')balanceRequestPrimaryV51(id);if(typeof guardOfferButtonsV55==='function')guardOfferButtonsV55(id);
 }
 async function reloadAuctionOffers(id,owner){
- const {data,error}=await db.from('offers').select('id,request_id,seller_id,price,description,created_at').eq('request_id',id).order('created_at',{ascending:false});if(error)throw error;
+ const {data,error}=await db.from('offers').select('id,request_id,seller_id,price,description,created_at,valid_until').eq('request_id',id).order('created_at',{ascending:false});if(error)throw error;
  if(user?.id!==owner)return;
  const previous=offers.filter(o=>o.request_id===id),changed=previous.length!==(data||[]).length||(data||[]).some(row=>previous.find(o=>o.id===row.id)?.price!==row.price);
  const fresh=(data||[]).map(row=>{const item=previous.find(o=>o.id===row.id);return item?Object.assign(item,row):row});

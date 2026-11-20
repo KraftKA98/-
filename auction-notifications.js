@@ -24,7 +24,7 @@ async function openAuctionNotification(id){
    if(user?.id!==owner)return;
    if(!offer||offer.seller_id!==owner||offer.request_id!==notice.request_id){await markAuctionNoticeRead(id,owner);return toast('Ваше предложение уже недоступно')}
    const [requestResult,dealResult,photoResult]=await Promise.all([
-    db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at').eq('id',offer.request_id).maybeSingle(),
+    db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at,quantity').eq('id',offer.request_id).maybeSingle(),
     db.from('deals').select('id,request_id,offer_id,buyer_id,seller_id,status,selected_at,completed_at').eq('request_id',offer.request_id),
     db.from('offer_images').select('id,offer_id,path,created_at').eq('offer_id',offer.id)
    ]);
@@ -34,7 +34,7 @@ async function openAuctionNotification(id){
    upsertAuctionNoticeOffer(offer);deals=[...deals.filter(d=>d.request_id!==offer.request_id),...(dealResult.data||[])];offerImages=[...offerImages.filter(p=>p.offer_id!==offer.id),...(photoResult.data||[])];
    if(!await markAuctionNoticeRead(id,owner))return;closeModal();await openChat(offer.id);return;
   }
-  const {data:request,error:requestError}=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at').eq('id',notice.request_id).maybeSingle();if(requestError)throw requestError;
+  const {data:request,error:requestError}=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at,quantity').eq('id',notice.request_id).maybeSingle();if(requestError)throw requestError;
   if(user?.id!==owner)return;
   if(!request||request.buyer_id!==owner){await markAuctionNoticeRead(id,owner);return toast('Это желание уже недоступно')}
   const [offerResult,dealResult]=await Promise.all([
