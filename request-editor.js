@@ -3,6 +3,7 @@ const requestPhotoCache=new Map();
 let requestPhotoRefreshQueued=false;
 function clearRequestEditor(){
   if(requestEditorState?.busy)return false;
+  if(typeof flushLocalDraftV52==='function')flushLocalDraftV52('wish');
   for(const item of requestEditorState?.files||[])URL.revokeObjectURL(item.url);
   requestEditorState=null;return true;
 }
@@ -43,7 +44,7 @@ function requestPhotoEditorMarkup(){
 function renderRequestPhotoDraft(){
   const host=$('requestPhotoDraft'),state=requestEditorState;if(!host||!state)return;
   host.innerHTML=state.keep.map((path,i)=>`<div class="request-photo-item"><img data-request-photo="${esc(path)}" alt="Прикреплённое фото" hidden><button type="button" class="request-photo-remove" aria-label="Убрать фото ${i+1}" onclick="removeRequestPhoto('keep',${i})">×</button></div>`).join('')+state.files.map((item,i)=>`<div class="request-photo-item"><img src="${esc(item.url)}" alt="Новое фото ${i+1}"><button type="button" class="request-photo-remove" aria-label="Убрать новое фото ${i+1}" onclick="removeRequestPhoto('new',${i})">×</button></div>`).join('');
-  queueRequestPhotos();if(typeof updateWishGuidanceV32==='function')updateWishGuidanceV32();
+  if(typeof flushLocalDraftV52==='function')flushLocalDraftV52('wish');queueRequestPhotos();if(typeof updateWishGuidanceV32==='function')updateWishGuidanceV32();
 }
 function addRequestPhotos(input){
   const state=requestEditorState;if(!state||state.busy)return;
@@ -97,7 +98,7 @@ function openRequestEditor(id=null,prefill={}){
     const option=new Option(original.category,original.category,true,true);form.elements.categoryParent.add(option);form.elements.category.value=original.category;
   }
   for(const [key,value] of Object.entries(values.details||{})){const field=form.elements['detail_'+key];if(field)field.value=value}
-  refreshRequestBudget(form);renderRequestPhotoDraft();if(typeof socialBindDraft==='function')socialBindDraft(form);if(typeof bindWishGuidanceV32==='function')bindWishGuidanceV32(form);if(typeof simplifyWishFormV36==='function')simplifyWishFormV36(form);addSharingFieldsV49(form,original?.id||null);
+  refreshRequestBudget(form);renderRequestPhotoDraft();if(typeof socialBindDraft==='function')socialBindDraft(form);if(typeof bindWishGuidanceV32==='function')bindWishGuidanceV32(form);if(typeof simplifyWishFormV36==='function')simplifyWishFormV36(form);addSharingFieldsV49(form,original?.id||null);if(!original&&typeof bindLocalDraftV52==='function')bindLocalDraftV52(form,'wish',Object.values(prefill).some(Boolean));
 }
 function validateRequestRecord(record,original){
   if(!isKnownCategory(record.category)&&record.category!==original?.category)throw Error('Выберите категорию');
@@ -113,14 +114,14 @@ async function submitRequestEditor(event){
   const form=event.target,values=new FormData(form),actor=user.id;
   const record={id:state.id,buyer_id:actor,title:String(values.get('title')||'').trim(),category:String(values.get('category')||''),city:String(values.get('city')||'').trim(),budget:Number(values.get('budget')),description:''};
   const controlStates=[...form.elements].map(control=>[control,control.disabled]);
-  let uploaded=[],createdNow=false;
+  let uploaded=[],createdNow=false,feedback=null;
   try{
     record.description=requestDescription(values,record.category);validateRequestRecord(record,state.original);if(!state.editing){record.valid_for_days=Number(values.get('valid_for_days')||30);if(![7,14,30,90].includes(record.valid_for_days))throw Error('Проверьте срок актуальности')}
-    state.busy=true;for(const [control] of controlStates)control.disabled=true;
+    state.busy=true;if(typeof beginSubmitV52==='function')feedback=beginSubmitV52(form,'Сохраняем…');for(const [control] of controlStates)control.disabled=true;
     if(!state.editing){
       const {error}=await db.from('requests').insert({...record,image_paths:[]});
       if(error)throw error;
-      createdNow=true;state.editing=true;state.original={...record,...(typeof requestLifetimeCreatedFields==='function'?requestLifetimeCreatedFields(record.valid_for_days):{}),image_paths:[],revision:0,status:'open',is_hidden:false,created_at:new Date().toISOString()};
+      createdNow=true;if(typeof deleteLocalDraftV52==='function')deleteLocalDraftV52('wish',actor);state.editing=true;state.original={...record,...(typeof requestLifetimeCreatedFields==='function'?requestLifetimeCreatedFields(record.valid_for_days):{}),image_paths:[],revision:0,status:'open',is_hidden:false,created_at:new Date().toISOString()};
     }
     let failed=0;
     for(const item of state.files){
@@ -137,7 +138,7 @@ async function submitRequestEditor(event){
     const removed=requestPhotoPaths(state.original).filter(path=>!state.keep.includes(path));
     await removeUnreferencedRequestPhotos(removed);
     const sharingWarning=await saveCreationSharingV49(saved.id,values,actor);if(user?.id!==actor)return;
-    state.busy=false;if(typeof socialDraftPublished==='function')socialDraftPublished(state.id);closeModal();
+    state.busy=false;if(typeof deleteLocalDraftV52==='function')deleteLocalDraftV52('wish',actor);if(typeof socialDraftPublished==='function')socialDraftPublished(state.id);closeModal();
     requests=requests.filter(request=>request.id!==saved.id);requests.unshift(saved);renderAll();
     await refreshAll();
     if(!requests.some(request=>request.id===saved.id))requests.unshift(saved);
@@ -152,6 +153,6 @@ async function submitRequestEditor(event){
     const message=(createdNow?'Желание уже опубликовано, но фото не сохранены. Повторите сохранение. ':'')+(error.message||'Не удалось сохранить');
     const host=$('requestEditorError');if(host){host.textContent=message;host.hidden=false}
     if(createdNow){const button=form.querySelector('[type="submit"]');if(button)button.textContent='Сохранить изменения'}
-    toast(message);
-  }finally{state.busy=false;for(const [control,disabled] of controlStates)if(control.isConnected)control.disabled=disabled}
+    if(typeof failSubmitV52==='function')failSubmitV52(form,message);toast(message);
+  }finally{if(typeof endSubmitV52==='function')endSubmitV52(feedback,true);state.busy=false;for(const [control,disabled] of controlStates)if(control.isConnected)control.disabled=disabled}
 }
