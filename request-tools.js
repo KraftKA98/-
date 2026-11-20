@@ -64,7 +64,7 @@ function refreshRequestBudget(form){
   const group=categoryGroup(category)?.[1];
   const intent=form.querySelector('[name="detail_intent"]')?.value;
   const label=group==='Работа'?'Зарплата в месяц, ₽':group==='Недвижимость'&&intent==='Снять на длительный срок'?'Бюджет в месяц до, ₽':group==='Недвижимость'&&intent==='Снять посуточно'?'Бюджет за сутки до, ₽':'Бюджет до, ₽';
-  form.querySelector('[data-budget-label]').textContent=label;
+  form.querySelector('[data-budget-label]').textContent=label;if(typeof updateQuantityFormV55==='function')updateQuantityFormV55(form);
 }
 function requestDescription(formData,category){
   const lines=[];
@@ -95,7 +95,7 @@ function requestFormMarkup(prefill={}){
     <label class="fieldset" style="display:block"><span class="fieldlabel">Что вы ищете?</span><input class="field" name="title" maxlength="120" minlength="4" required placeholder="Например, ноутбук для учёбы" value="${esc(prefill.title||'')}"></label>
     <div class="fieldset"><span class="fieldlabel">Категория</span>${categoryPicker(category)}</div>
     <div data-request-details data-group="${esc(categoryGroup(category)?.[1]||'')}">${requestDetailsMarkup(category,prefill.brand)}</div>
-    <label class="fieldset" style="display:block"><span class="fieldlabel" data-budget-label>Бюджет до, ₽</span><input class="field" type="number" min="1" max="1000000000" step="1" name="budget" required value="${esc(prefill.budget||'')}"></label>
+    ${typeof quantityFormV55==='function'?quantityFormV55(prefill):''}<label class="fieldset" style="display:block"><span class="fieldlabel" data-budget-label>Бюджет до, ₽</span><input class="field" type="number" min="1" max="1000000000" step="1" name="budget" required value="${esc(prefill.budget||'')}"></label>
     <label class="fieldset" style="display:block"><span class="fieldlabel">Город</span><input class="field" name="city" minlength="2" maxlength="100" required value="${esc(prefill.city||profile?.city||'')}"></label>
     <label class="fieldset" style="display:block"><span class="fieldlabel">Дополнительные пожелания</span><textarea class="field" name="description" maxlength="2000" placeholder="Что ещё важно?">${esc(prefill.description||'')}</textarea></label>
     ${!prefill.id&&typeof requestLifetimeFieldMarkup==='function'?requestLifetimeFieldMarkup(prefill.valid_for_days||30):''}${requestPhotoEditorMarkup()}<p class="small muted">Характеристики войдут в описание. Общая длина — до 2000 символов.</p>

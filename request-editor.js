@@ -116,7 +116,7 @@ async function submitRequestEditor(event){
   const controlStates=[...form.elements].map(control=>[control,control.disabled]);
   let uploaded=[],createdNow=false,feedback=null;
   try{
-    record.description=requestDescription(values,record.category);validateRequestRecord(record,state.original);if(!state.editing){record.valid_for_days=Number(values.get('valid_for_days')||30);if(![7,14,30,90].includes(record.valid_for_days))throw Error('Проверьте срок актуальности')}
+    record.description=requestDescription(values,record.category);validateRequestRecord(record,state.original);if(!state.editing){record.quantity=Number(values.get('quantity')||1);if(!Number.isInteger(record.quantity)||record.quantity<1||record.quantity>10000)throw Error('Количество — от 1 до 10 000 целых единиц');record.valid_for_days=Number(values.get('valid_for_days')||30);if(![7,14,30,90].includes(record.valid_for_days))throw Error('Проверьте срок актуальности')}
     state.busy=true;if(typeof beginSubmitV52==='function')feedback=beginSubmitV52(form,'Сохраняем…');for(const [control] of controlStates)control.disabled=true;
     if(!state.editing){
       const {error}=await db.from('requests').insert({...record,image_paths:[]});

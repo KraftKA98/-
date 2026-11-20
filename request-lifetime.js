@@ -19,14 +19,14 @@ async function loadRequestLifetimeClock(){
  requestLifetimeClockPending=Promise.resolve().then(async()=>{try{const {data,error}=await db.rpc('hochu_request_clock_v248');if(!error&&Number.isFinite(Date.parse(data)))requestLifetimeClockOffset=Date.parse(data)-Date.now()}catch(error){}finally{requestLifetimeClockPending=null}});return requestLifetimeClockPending;
 }
 async function ensureCurrentRequestLifetime(id){
- const actor=user?.id;const {data,error}=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at').eq('id',id).maybeSingle();if(error)throw error;
+ const actor=user?.id;const {data,error}=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at,quantity').eq('id',id).maybeSingle();if(error)throw error;
  if(user?.id!==actor)throw Error('Аккаунт изменился');if(!data||data.status!=='open'||data.is_hidden||!requestIsCurrent(data))throw Error('Желание закрыто или срок его актуальности истёк');
  const item=requests.find(r=>r.id===id);item?Object.assign(item,data):requests.push(data);return data;
 }
 async function openRequestLifetime(id){
  if(!requireAuth())return;const owner=user.id;
  try{
-  const {data:request,error}=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at').eq('id',id).maybeSingle();if(error)throw error;
+  const {data:request,error}=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at,quantity').eq('id',id).maybeSingle();if(error)throw error;
   if(user?.id!==owner)return;if(!request||request.buyer_id!==owner||request.is_hidden)throw Error('Желание недоступно');
   modal({title:'Подтвердить актуальность',body:`<p>${esc(request.title)}</p>${requestLifetimeBadge(request)}<form id="requestLifetimeForm">${requestLifetimeFieldMarkup(request.valid_for_days||30)}<p class="small muted">Подтвердите, что всё ещё ищете товар. Срок будет не короче выбранного периода от сегодня. Полученные предложения сохранятся. Срок и шаг уже начатых торгов не меняются.</p><p role="alert" class="small"></p><button class="btn block" type="submit">Всё ещё ищу — подтвердить</button></form>`});
   const form=$('requestLifetimeForm');if(form)form.addEventListener('submit',event=>renewRequestLifetime(event,request));
@@ -51,7 +51,7 @@ async function openExpiredRequestNotification(id){
  try{
   const {data:n,error}=await db.from('notifications').select('id,recipient_id,request_id,request_event').eq('id',id).maybeSingle();if(error)throw error;if(user?.id!==owner)return;
   if(!n||n.recipient_id!==owner||n.request_event!=='request_expired')throw Error('Уведомление недоступно');
-  let r=null;if(n.request_id){const result=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at').eq('id',n.request_id).maybeSingle();if(result.error)throw result.error;r=result.data}
+  let r=null;if(n.request_id){const result=await db.from('requests').select('id,buyer_id,title,description,category,city,budget,status,created_at,is_hidden,image_paths,revision,valid_for_days,expires_at,last_confirmed_at,expired_at,quantity').eq('id',n.request_id).maybeSingle();if(result.error)throw result.error;r=result.data}
   if(user?.id!==owner)return;
   if(r&&r.buyer_id===owner){const [a,b]=await Promise.all([db.from('offers').select('id,request_id,seller_id,price,description,created_at').eq('request_id',r.id),db.from('deals').select('id,request_id,offer_id,buyer_id,seller_id,status,selected_at,completed_at').eq('request_id',r.id)]);if(a.error)throw a.error;if(b.error)throw b.error;if(user?.id!==owner)return;const item=requests.find(q=>q.id===r.id);item?Object.assign(item,r):requests.push(r);offers=[...offers.filter(o=>o.request_id!==r.id),...(a.data||[])];deals=[...deals.filter(d=>d.request_id!==r.id),...(b.data||[])]}
   if(!await markAuctionNoticeRead(id,owner))return;
