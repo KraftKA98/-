@@ -47,9 +47,9 @@ async function reloadAuctionOffers(id,owner){
  const comparison=$('offerComparisonDetails');
  if(changed&&comparison?.isConnected&&comparisonRequestId===id){
   const request=requests.find(r=>r.id===id),selected=offers.filter(o=>o.request_id===id&&comparisonOfferIds.has(o.id));
-  if(request&&selected.length>=2){const horizontal=comparison.querySelector('.offer-comparison-scroll')?.scrollLeft||0,vertical=$('modal').scrollTop;
+  if(request&&selected.length>=2){const expanded=typeof captureComparisonV53==='function'?captureComparisonV53(comparison):[],horizontal=comparison.querySelector('.offer-comparison-scroll')?.scrollLeft||0,vertical=$('modal').scrollTop;
    comparison.innerHTML=detailedOfferComparisonMarkup(request,selected);const panel=comparison.querySelector('[data-auction-panel]');if(panel)panel.innerHTML=auctionPanelContent(request,cachedAuction(id));
-   comparison.querySelector('.offer-comparison-scroll').scrollLeft=horizontal;$('modal').scrollTop=vertical;for(const o of selected)loadOfferGallery(o.id);
+   comparison.querySelector('.offer-comparison-scroll').scrollLeft=horizontal;if(typeof restoreComparisonV53==='function')restoreComparisonV53(comparison,expanded);$('modal').scrollTop=vertical;for(const o of selected)loadOfferGallery(o.id);
   }
  }
  updateAuctionControls(id);
