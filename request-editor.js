@@ -10,7 +10,7 @@ function clearRequestEditor(){
 function editableWish(request){return !!request&&request.buyer_id===user?.id&&request.status==='open'&&!request.is_hidden&&(typeof requestIsCurrent!=='function'||requestIsCurrent(request))&&!deals.some(deal=>deal.request_id===request.id)}
 function requestPhotoPaths(request){return Array.isArray(request?.image_paths)?request.image_paths.filter(path=>typeof path==='string').slice(0,5):[]}
 function requestPhotosMarkup(request,cover=false){
-  const paths=requestPhotoPaths(request);if(!paths.length)return '';
+  const paths=requestPhotoPaths(request);if(!paths.length)return cover?'<div class="empty-cover-v56" aria-label="Объявление без фотографии"><span aria-hidden="true">▧</span>Без фото</div>':'';
   if(cover)return `<div class="request-cover"><img data-request-photo="${esc(paths[0])}" loading="lazy" alt="Фото к желанию" hidden><span class="chip">📷 ${paths.length}</span><button type="button" class="photo-retry-v51 btn ghost" aria-label="Повторить загрузку фото" onclick="retryRequestPhotoV51(this)" hidden>Повторить фото</button></div>`;
   return `<div class="request-photo-gallery">${paths.map(path=>`<a data-request-photo-link="${esc(path)}" target="_blank" rel="noopener" hidden><img data-request-photo="${esc(path)}" loading="lazy" alt="Фото к желанию" hidden></a>`).join('')}</div>`;
 }
