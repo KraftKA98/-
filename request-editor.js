@@ -3,7 +3,7 @@ const requestPhotoCache=new Map();
 let requestPhotoRefreshQueued=false;
 function clearRequestEditor(){
   if(requestEditorState?.busy)return false;
-  if(typeof flushLocalDraftV52==='function')flushLocalDraftV52('wish');
+  if(typeof flushLocalDraftV52==='function')flushLocalDraftV52('wish');if(typeof cleanRequestUploadsV54==='function'&&requestEditorState)void cleanRequestUploadsV54(requestEditorState);
   for(const item of requestEditorState?.files||[])URL.revokeObjectURL(item.url);
   requestEditorState=null;return true;
 }
@@ -43,7 +43,7 @@ function requestPhotoEditorMarkup(){
 }
 function renderRequestPhotoDraft(){
   const host=$('requestPhotoDraft'),state=requestEditorState;if(!host||!state)return;
-  host.innerHTML=state.keep.map((path,i)=>`<div class="request-photo-item"><img data-request-photo="${esc(path)}" alt="Прикреплённое фото" hidden><button type="button" class="request-photo-remove" aria-label="Убрать фото ${i+1}" onclick="removeRequestPhoto('keep',${i})">×</button></div>`).join('')+state.files.map((item,i)=>`<div class="request-photo-item"><img src="${esc(item.url)}" alt="Новое фото ${i+1}"><button type="button" class="request-photo-remove" aria-label="Убрать новое фото ${i+1}" onclick="removeRequestPhoto('new',${i})">×</button></div>`).join('');
+  host.innerHTML=typeof requestPhotoDraftMarkupV54==='function'?requestPhotoDraftMarkupV54(state):state.keep.map((path,i)=>`<div class="request-photo-item"><img data-request-photo="${esc(path)}" alt="Прикреплённое фото" hidden><button type="button" class="request-photo-remove" aria-label="Убрать фото ${i+1}" onclick="removeRequestPhoto('keep',${i})">×</button></div>`).join('')+state.files.map((item,i)=>`<div class="request-photo-item"><img src="${esc(item.url)}" alt="Новое фото ${i+1}"><button type="button" class="request-photo-remove" aria-label="Убрать новое фото ${i+1}" onclick="removeRequestPhoto('new',${i})">×</button></div>`).join('');
   if(typeof flushLocalDraftV52==='function')flushLocalDraftV52('wish');queueRequestPhotos();if(typeof updateWishGuidanceV32==='function')updateWishGuidanceV32();
 }
 function addRequestPhotos(input){
@@ -54,7 +54,7 @@ function addRequestPhotos(input){
     files.forEach(file=>{validateImage(file,5);if(!file.size)throw Error('Пустой файл нельзя загрузить')});
     for(const file of files)state.files.push({file,url:URL.createObjectURL(file)});
     renderRequestPhotoDraft();
-  }catch(error){toast(error.message)}
+  }catch(error){if(typeof fieldErrorV54==='function'&&input.form)fieldErrorV54(input,error.message);toast(error.message)}
 }
 function removeRequestPhoto(kind,index){
   const state=requestEditorState;if(!state||state.busy)return;
@@ -92,7 +92,7 @@ function openRequestEditor(id=null,prefill={}){
   let body=requestFormMarkup(values);
   if(original)body='<p class="small muted">Изменения увидят продавцы. Полученные предложения сохранятся со своими прежними условиями.</p>'+body.replace('Опубликовать желание','Сохранить изменения');
   enterViewV50('editor:'+(id||'new'),()=>openRequestEditor(id,prefill));modal({title:original?'Редактировать желание':'Новое желание',body});
-  requestEditorState={id:original?.id||crypto.randomUUID(),original,revision:original?.revision||0,editing:!!original,keep:requestPhotoPaths(original),files:[],busy:false};
+  requestEditorState={id:original?.id||crypto.randomUUID(),original,revision:original?.revision||0,editing:!!original,keep:requestPhotoPaths(original),files:[],busy:false,actorV54:user.id};
   const form=$('modal').querySelector('form');
   if(original&&!isKnownCategory(original.category)){
     const option=new Option(original.category,original.category,true,true);form.elements.categoryParent.add(option);form.elements.category.value=original.category;
@@ -124,14 +124,22 @@ async function submitRequestEditor(event){
       createdNow=true;if(typeof deleteLocalDraftV52==='function')deleteLocalDraftV52('wish',actor);state.editing=true;state.original={...record,...(typeof requestLifetimeCreatedFields==='function'?requestLifetimeCreatedFields(record.valid_for_days):{}),image_paths:[],revision:0,status:'open',is_hidden:false,created_at:new Date().toISOString()};
     }
     let failed=0;
+    const uploadedByV54=state.uploadedV54||(state.uploadedV54=new Map());
     for(const item of state.files){
-      const path=`${actor}/${record.id}/${crypto.randomUUID()}.${imageExt(item.file)}`;
-      try{const {error}=await db.storage.from('hochu-request-images').upload(path,item.file,{contentType:item.file.type,upsert:false});if(error)throw error;uploaded.push(path)}catch(error){failed++}
+      const path=item.uploadPathV54||(item.uploadPathV54=`${actor}/${record.id}/${crypto.randomUUID()}.${imageExt(item.file)}`);
+      try{
+        if(!uploadedByV54.has(item)){
+          const result=typeof uploadFileV54==='function'?await uploadFileV54('hochu-request-images',path,item.file,form):await db.storage.from('hochu-request-images').upload(path,item.file,{contentType:item.file.type,upsert:false});
+          if(result.error){const probe=await db.storage.from('hochu-request-images').createSignedUrl(path,30);if(probe.error)throw result.error;if(typeof showUploadProgressV54==='function')showUploadProgressV54(form,item.file.name,item.file.size,item.file.size,'done')}
+          uploadedByV54.set(item,path);
+        }
+        uploaded.push(uploadedByV54.get(item));
+      }catch(error){failed++}
     }
-    if(failed&&!createdNow)throw Error(`Не загрузилось фото: ${failed}. Изменения не сохранены — повторите попытку.`);
+    if(failed)throw Error(`Не загрузилось фото: ${failed}. Повторная отправка загрузит только оставшиеся файлы.`);
     let saved=createdNow?state.original:null;
     if(!createdNow||uploaded.length){
-      const {data,error}=await db.rpc('hochu_request_edit_v240',{p_request_id:record.id,p_expected_revision:state.revision,p_title:record.title,p_description:record.description,p_category:record.category,p_city:record.city,p_budget:record.budget,p_image_paths:[...state.keep,...uploaded]});
+      const {data,error}=await db.rpc('hochu_request_edit_v240',{p_request_id:record.id,p_expected_revision:state.revision,p_title:record.title,p_description:record.description,p_category:record.category,p_city:record.city,p_budget:record.budget,p_image_paths:typeof orderedRequestPathsV54==='function'?orderedRequestPathsV54(state,uploadedByV54):[...state.keep,...uploaded]});
       if(error)throw error;saved=data;
       if(!saved?.id)throw Error('Сервер не подтвердил сохранение');
     }
@@ -148,7 +156,7 @@ async function submitRequestEditor(event){
     if(sharingWarning){const note=document.createElement('p');note.className='notice';note.setAttribute('role','alert');note.textContent=sharingWarning;$('modal').append(note)}
     toast(message);
   }catch(error){
-    await removeUnreferencedRequestPhotos(uploaded);
+    if(typeof cleanRequestUploadsV54!=='function')await removeUnreferencedRequestPhotos(uploaded);
     state.busy=false;
     const message=(createdNow?'Желание уже опубликовано, но фото не сохранены. Повторите сохранение. ':'')+(error.message||'Не удалось сохранить');
     const host=$('requestEditorError');if(host){host.textContent=message;host.hidden=false}
