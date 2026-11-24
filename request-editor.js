@@ -33,7 +33,7 @@ function queueRequestPhotos(){
     if(viewer!==(user?.id||'guest'))return;
     for(const image of document.querySelectorAll('img[data-request-photo]')){
       const record=requestPhotoCache.get(image.dataset.requestPhoto);if(!record||record.expires<Date.now()){if(typeof markRequestPhotoV51==='function')markRequestPhotoV51(image,false);continue}
-      if(typeof prepareRequestPhotoV51==='function')prepareRequestPhotoV51(image);image.src=record.url;image.hidden=false;
+      if(typeof prepareRequestPhotoV51==='function')prepareRequestPhotoV51(image);if(typeof setRequestPhotoSourceV58==='function')setRequestPhotoSourceV58(image,record);else image.src=record.url;if(!image.closest('.request-cover'))image.hidden=false;
       const link=image.closest('a[data-request-photo-link]');if(link){link.href=record.url;link.hidden=false}
     }
   }).catch(()=>{});
