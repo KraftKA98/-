@@ -13,7 +13,7 @@
     panel = document.createElement('aside');
     panel.className = 'pwa-install';
     panel.setAttribute('aria-label', 'Установка приложения');
-    panel.innerHTML = '<button class="pwa-close" aria-label="Закрыть">×</button><strong>ХОЧУ. — всегда под рукой</strong>' + (ios ? '<p>В Safari нажмите «Поделиться», затем «На экран Домой», чтобы установить приложение.</p>' : '<p>Добавьте приложение на главный экран телефона.</p><button class="pwa-accept">Установить</button>');
+    panel.innerHTML = '<button class="pwa-close" aria-label="Закрыть">×</button><strong>Гими — всегда под рукой</strong>' + (ios ? '<p>В Safari нажмите «Поделиться», затем «На экран Домой», чтобы установить приложение.</p>' : '<p>Добавьте приложение на главный экран телефона.</p><button class="pwa-accept">Установить</button>');
     panel.querySelector('.pwa-close').onclick = () => {panel.remove();panel = null;try {sessionStorage.setItem('hochu-pwa-dismissed','1');} catch {}};
     const accept = panel.querySelector('.pwa-accept');
     if (accept) accept.onclick = async () => {
