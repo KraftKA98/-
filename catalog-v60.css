@@ -1,0 +1,2 @@
+.catalog-kinds-v60{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:5px;background:#eaf0e6;border-radius:14px;margin:12px 0 16px}.catalog-kinds-v60 button{min-height:46px;border-radius:10px;padding:10px;background:transparent;color:#506655;font-size:16px}.catalog-kinds-v60 button[aria-pressed=true]{background:#fff;color:#2c503a;box-shadow:0 2px 7px #27443010;font-weight:700}.catalog-kinds-v60 button:focus-visible{outline:3px solid #789d80;outline-offset:2px}#catalogAuctionTools[hidden]{display:none!important}
+[data-wish-only-v60][hidden]{display:none!important}
