@@ -41,7 +41,7 @@ async function resolveAuthV601(){
 }
 function showLoadFailureV601(message,bootstrap=false){
  feedLoadErrorV601={message,bootstrap};
- for(const id of ['homeRequests','catalogRequests']){const host=$(id);if(!host)continue;host.querySelectorAll(':scope > .loader').forEach(n=>n.remove());host.querySelector('[data-load-failure-v601]')?.remove();const panel=document.createElement('div');panel.className='notice';panel.dataset.loadFailureV601='true';panel.setAttribute('role','status');const text=document.createElement('p');text.textContent=message;const b=document.createElement('button');b.type='button';b.className='btn ghost';b.textContent='Повторить';b.onclick=()=>bootstrap?location.reload():refreshAll();panel.append(text,b);host.prepend(panel)}
+ for(const id of ['homeRequests','catalogRequests']){const host=$(id);if(!host)continue;host.querySelectorAll(':scope > .loader').forEach(n=>n.remove());host.querySelector('[data-load-failure-v601]')?.remove();const panel=document.createElement('div');panel.className='notice';panel.dataset.loadFailureV601='true';panel.setAttribute('role','status');const text=document.createElement('p');text.textContent=message;const b=document.createElement('button');b.type='button';b.className='btn ghost';b.textContent='Повторить';b.onclick=()=>bootstrap?location.reload():refreshAll();panel.append(text,b);const check=document.createElement('button');check.type='button';check.className='mini-link';check.textContent='Проверка подключения';check.onclick=()=>{if(typeof openConnectionCheckV62==='function')openConnectionCheckV62()};panel.append(check);host.prepend(panel)}
  const count=$('homeFeedCountV231');if(count)count.textContent=requests.length?'Показаны ранее загруженные желания':'Не удалось загрузить желания';
 }
 function clearLoadFailureV601(){feedLoadErrorV601=null;document.querySelectorAll('[data-load-failure-v601]').forEach(n=>n.remove())}
@@ -59,7 +59,7 @@ function refreshSingleFlightV601(){
     // Invalidate the timed-out pass before a retry; late replies cannot paint the UI.
     run.active=false;refreshSequenceV29++;
     if(attempt===0){showLoadFailureV601('Загрузка задерживается. Повторяем попытку…');await new Promise(resolve=>setTimeout(resolve,loadTimingV601.retry));if(refreshFlightV601!==run||!accountCurrentV29(run.stamp))return false;run.active=true;continue}
-    if(typeof feedFailureV57==='function')feedFailureV57();showLoadFailureV601('Не удалось загрузить желания. Проверьте соединение и повторите попытку.');return false;
+    if(typeof recordDiagnosticV62==='function')recordDiagnosticV62(error.name==='LoadTimeoutError'?'feed_timeout':'feed_failure');if(typeof feedFailureV57==='function')feedFailureV57();showLoadFailureV601('Не удалось загрузить желания. Проверьте соединение и повторите попытку.');return false;
    }
   }
  }).finally(()=>{run.active=false;if(refreshFlightV601===run)refreshFlightV601=null});
